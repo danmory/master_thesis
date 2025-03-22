@@ -1,0 +1,72 @@
+Rental Agreement
+
+Lessor: John Doe
+Lessee: Alice Smith
+Property Address: 123 Main St, New York, NY 10001
+Rent Amount: 0.5 ETH per month
+Payment Frequency: Monthly
+Agreement End Date: December 31, 2025
+
+Rights and Obligations
+1. The lessee agrees to pay the rent on time each month.
+2. The lessor is responsible for maintaining the structural integrity of the property.
+3. The lessee shall not sublease the property without prior written consent from the lessor.
+4. Both parties agree to comply with local housing regulations.
+5. The lessee is responsible for utility payments unless otherwise agreed upon.
+6. The lessor shall provide at least 30 days' notice before termination, unless breach occurs.
+7. Any damages beyond normal wear and tear shall be covered by the lessee.
+8. The lessor has the right to inspect the property with prior notice.
+9. Disputes shall be resolved through arbitration before any legal proceedings.
+
+Requisites
+Lessor Ethereum Address: 0x1234567890abcdef1234567890abcdef12345678
+Lessee Ethereum Address: 0xabcdef1234567890abcdef1234567890abcdef12
+
+----------------------------
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+contract RentalAgreement {
+    address public lessor = 0x1234567890abcdef1234567890abcdef12345678;
+    address public lessee = 0xabcdef1234567890abcdef1234567890abcdef12;
+    string public propertyAddress = "123 Main St, New York, NY 10001";
+    uint256 public rentAmount = 0.5 ether;
+    1767128400
+
+    uint256 public agreementEndDate = 1767225600; // December 31, 2025 (Unix timestamp)
+
+    event RentPaid(address indexed lessee, uint256 amount, uint256 timestamp);
+    event AgreementTerminated(address indexed lessor, uint256 timestamp);
+
+    modifier onlyLessee() {
+        require(msg.sender == lessee, "Only the lessee can perform this action");
+        _;
+    }
+
+    modifier onlyLessor() {
+        require(msg.sender == lessor, "Only the lessor can perform this action");
+        _;
+    }
+
+    function payRent() external payable onlyLessee {
+        require(block.timestamp < agreementEndDate, "Agreement has ended");
+        require(msg.value == rentAmount, "Incorrect rent amount");
+        payable(lessor).transfer(msg.value);
+        emit RentPaid(msg.sender, msg.value, block.timestamp);
+    }
+
+    function terminateAgreement() external onlyLessor {
+        require(block.timestamp < agreementEndDate, "Agreement has already ended");
+        agreementEndDate = block.timestamp; // Ends the agreement immediately
+        emit AgreementTerminated(msg.sender, block.timestamp);
+    }
+}
+
+--------------------------------------
+
+Missing:
+1. if lessor is SC then payRent may not always work due to gas limits. Maybe require block?
+2. No methods for "The lessor shall provide at least 30 days' notice before termination, unless breach occurs."
+3. `terminateAgreement` does not count for lessee
+4. No checks that payment is monthly.
