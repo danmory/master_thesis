@@ -1,0 +1,55 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract RentalAgreement {
+    address public lessor;
+    address public lessee;
+    string public propertyAddress;
+    uint256 public rentAmount;
+    uint256 public paymentFrequency;
+    uint256 public agreementEndDate;
+    mapping(uint => bool) payments;
+
+    event RentPaid(address indexed sender, uint256 amount);
+    event AgreementTerminated(address indexed sender);
+    event PaymentVerified(address indexed sender, uint256 paymentNumber);
+
+    constructor(
+        address _lessor,
+        address _lessee,
+        string memory _propertyAddress,
+        uint256 _rentAmount,
+        uint256 _paymentFrequency,
+        uint256 _agreementEndDate
+    ) {
+        lessor = _lessor;
+        lessee = _lessee;
+        propertyAddress = _propertyAddress;
+        rentAmount = _rentAmount;
+        paymentFrequency = _paymentFrequency;
+        agreementEndDate = _agreementEndDate;
+    }
+
+    function payRent() public {
+        require(msg.sender == lessee, "Only the lessee can pay rent.");
+        require(block.timestamp < agreementEndDate, "Agreement has ended.");
+        uint256 paymentNumber = block.timestamp / (paymentFrequency * 1 days);
+        require(!payments[paymentNumber], "Payment already made for this month.");
+        payments[paymentNumber] = true;
+        emit RentPaid(msg.sender, rentAmount);
+    }
+
+    function verifyPayment() public {
+        require(msg.sender == lessor, "Only the lessor can verify payment.");
+        uint256 paymentNumber = block.timestamp / (paymentFrequency * 1 days);
+        require(payments[paymentNumber], "No payment found for this period.");
+        emit PaymentVerified(msg.sender, paymentNumber);
+    }
+
+    function terminateAgreement() public {
+        require(msg.sender == lessor || msg.sender == lessee, "Unauthorized");
+        require(block.timestamp < agreementEndDate, "Agreement already ended");
+        agreementEndDate = block.timestamp;
+        emit AgreementTerminated(msg.sender);
+    }
+}
