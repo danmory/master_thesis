@@ -1,0 +1,715 @@
+STANDARD RESIDENTIAL LEASE AGREEMENT
+
+1.  THE PARTIES. This Residential Lease Agreement (“Agreement”) is made
+    on the undersigned date by and between:
+
+Landlord
+
+  Landlord's Name: [LANDLORD'S NAME]
+
+  Mailing Address: [LANDLORD'S ADDRESS]
+
+  Tenant
+
+Tenant’s Name: [TENANT'S NAME]
+
+  Additional Occupants: [TENANT'S ADDRESS]
+
+2.  PROPERTY.
+
+- Property Address: [PROPERTY ADDRESS]
+
+- Residence Type: ☐ Apartment ☐ House ☐ Condo ☐ Other: [DESCRIBE]
+
+- Bedroom(s): [#] Bathroom(s): [#]
+
+3.  TERM.
+
+- Start Date: [START DATE]
+
+- End Date: [END DATE]
+
+4.  RENT.
+
+- Monthly Rent: $[AMOUNT]
+
+- Due Date: [#] day of each month.
+
+5.  SECURITY DEPOSIT. (check one)
+
+☐ - No Security Deposit.
+
+☐ - Security Deposit.
+
+- Amount: $[AMOUNT]
+
+- Returning to Tenant: [#] days after lease termination.
+
+6.  LATE FEE. (check one)
+
+☐ - No Late Fee.
+
+☐ - Late Fee: (check one)
+
+  ☐ - Fixed Amount. $[AMOUNT] for each ☐ occurrence ☐ day rent is late.
+
+  ☐ - Interest. [#]% per annum.
+
+7.  NSF FEE. (check one)
+
+☐ - No NSF Fee.
+
+☐ - NSF Fee: $[AMOUNT]
+
+8.  EARLY MOVE-IN. (check one)
+
+  ☐ - No Early Move-in.
+
+  ☐ - Early Move-in.
+
+- Date: [MOVE-IN DATE]
+
+- Prorated Rent. $[AMOUNT]
+
+9.  PRE-PAYMENT OF RENT. (check one)
+
+  ☐ - No Pre-Payment of Rent is Required.
+
+  ☐ - Pre-Payment of Rent is Required.
+
+  Pre-Payment Amount: $[AMOUNT]
+
+  Pre-Payment Period:
+
+  Start Date: [START DATE]
+
+  End Date: [END DATE]
+
+10. ACCEPTABLE PAYMENT METHODS. The Landlord accepts any of the
+    following payment methods from the Tenant: (check all that apply)
+
+  ☐ - ACH (electronic bank transfer)
+
+  ☐ - Cash
+
+  ☐ - Check
+
+  ☐ - Credit Card
+
+  ☐ - PayPal (e-mail is: [PAYPAL E-MAIL])
+
+  ☐ - Venmo (e-mail/username is: [E-MAIL/USERNAME])
+
+  ☐ - Zelle (e-mail/phone number is: [E-MAIL/PHONE NUMBER])
+
+  ☐ - Other: [DESCRIBE]
+
+11. PETS. (check one)
+
+  ☐ - No Pets Allowed.
+
+  ☐ - Pets are Allowed.
+
+  Number of Pets: [#]
+
+  Types: [PET TYPES]
+
+  Maximum Weight (per pet): [#] Pounds
+
+  Deposit (for all pets): $[AMOUNT] ☐ refundable ☐ non-refundable
+
+12. SMOKING POLICY. (check one)
+
+  ☐ - No Smoking Allowed.
+
+  ☐ - Smoking is Allowed.
+
+13. PARKING. (check one)
+
+  ☐ - No Parking Provided.
+
+  ☐ - Parking is Provided. [#] parking spaces are provided with: (check
+  one)
+
+  ☐ - No Fee.
+
+  ☐ - Fee (describe). [DESCRIBE PARKING FEE]
+
+14. FURNITURE. (check one)
+
+☐ - Property is Not Furnished.
+
+☐ - Property is Furnished: (check all that apply)
+
+  ☐ - Bathroom(s)
+
+  ☐ - Bedroom(s)
+
+  ☐ - Dining Room
+
+  ☐ - Kitchen
+
+  ☐ - Living Room
+
+  ☐ - Other: [DESCRIBE FURNISHINGS]
+
+15. APPLIANCES. (check one)
+
+☐ - Property Has No Appliances.
+
+☐ - Property Has Appliances: (check all that apply)
+
+  ☐ - Ceiling Fans
+
+  ☐ - Dishwasher
+
+  ☐ - Dryer (for laundry)
+
+  ☐ - Garbage Disposal
+
+  ☐ - Microwave
+
+  ☐ - Refrigerator
+
+  ☐ - Stove / Oven
+
+  ☐ - Washing Machine
+
+  ☐ - Water Heater
+
+  ☐ - Other. [DESCRIBE APPLIANCES]
+
+16. UTILITIES & SERVICES. The Landlord is responsible for: (check one)
+
+☐ - No Utilities & Services.
+
+☐ - Utilities & Services: (check all that apply)
+
+  ☐ - Cable (TV)
+
+  ☐ - Gas / Oil / Propane
+
+  ☐ - Electricity
+
+  ☐ - Internet
+
+  ☐ - Landscaping
+
+  ☐ - Water / Sewer
+
+  ☐ - Trash Removal
+
+  ☐ - Other: [DESCRIBE UTILITIES & SERVICES]
+
+17. RENTERS INSURANCE. (check one)
+
+  ☐ - No Renters Insurance Requirement.
+
+  ☐ - Renters Insurance is Required. $[AMOUNT] is the minimum limit for
+  property damage/loss and liability coverage per occurrence.
+
+18. MOVE-IN INSPECTION. (check one)
+
+  ☐ - No Move-In Inspection.
+
+  ☐ - Move-In Inspection is Required.
+
+19. SUBLETTING. (check one)
+
+  ☐ - No Subletting Allowed.
+
+  ☐ - Subletting Allowed with the Landlord’s Consent.
+
+20. NOTICES. If notice is sent by either Party, it shall be sent to:
+
+  Landlord. (check one)
+
+  ☐ - The address mentioned in Section 1.
+
+  ☐ - [LANDLORD'S NOTICE ADDRESS]
+
+  Tenant. (check one)
+
+  ☐ - The address of the Property.
+
+  ☐ - [TENANT'S NOTICE ADDRESS]
+
+21. ADDITIONAL TERMS & CONDITIONS. [ADDITIONAL TERMS & CONDITIONS]
+
+22. DISCLOSURES. The Landlord agrees to deliver the following to the
+    Tenant: (check all that apply)
+
+  ☐ - Lead-Based Paint Disclosure
+
+  ☐ - Protect Your Family From Lead in Your Home - Pamphlet
+
+  ☐ - Move-In Inspection Checklist
+
+  ☐ - [ADDITIONAL DISCLOSURE #1]
+
+  ☐ - [ADDITIONAL DISCLOSURE #2]
+
+  ☐ - [ADDITIONAL DISCLOSURE #3]
+
+  ☐ - [ADDITIONAL DISCLOSURE #4]
+
+23. DEFINITIONS. The terms mentioned in this Agreement are defined
+    below:
+
+a.  Abandonment. If the Tenant vacates or abandons the Property for a
+    period of up to seven days without informing the Landlord, the
+    Tenant will be considered in default of this Agreement. If the
+    Landlord believes the Tenant has vacated and abandoned the Property,
+    the Landlord is entitled to inspect the Property by providing 24
+    hours’ notice or the timeframe required under Governing Law,
+    whichever is greater.
+
+b.  Access. Upon the start of the Early Move-In or the Term, whichever
+    is applicable, the Landlord agrees to provide entry to the Tenant in
+    the form of keys, fobs, cards, or any type of keyless access to the
+    Property. Access to the Property shall be given after successful
+    payment and receipt of the amounts required at the execution of this
+    Agreement (see attached ‘Amount Due at Signing’).
+
+c.  Additional Occupants. Also referred to simply as “Occupants,” these
+    are individuals who have a legal right to reside on the Property
+    with the Tenant. The Tenant agrees to bear all responsibility and
+    liability for the actions made by the Occupants.
+
+d.  Disclosures. The Disclosures mentioned under Section 22, whether
+    they are attached to this Agreement or distributed to the Tenant
+    separately, are accepted, acknowledged, and understood by the Tenant
+    upon their execution of this Agreement.
+
+e.  Early Move-In. If the Tenant is permitted an Early Move-In, and any
+    pro-rated rent is required to be paid, such payment must be made by
+    the Tenant at the execution of this Agreement. If applicable and
+    selected in Section 8, this Early Move-In period shall be protected
+    under the same rights as the Term of this Agreement.
+
+f.  Furnishings and Appliances. The Tenant understands that the
+    Furnishings and Appliances mentioned herein are under the Landlord’s
+    ownership and must be returned in the same condition as at the start
+    of the Term, normal wear and tear excepted.
+
+g.  Governing Law. This Agreement shall be governed by and construed in
+    accordance with the laws of the jurisdiction where the Property is
+    located.
+
+h.  Guests. Refers to individuals who are not a Tenant or an Occupant
+    but are invited onto the Property on behalf of the Tenant. Guests
+    are permitted to stay on the Property for a period of no more than
+    48 hours.
+
+i.  Late Fee. Refers to a penalty accrued by the Tenant in connection to
+    any Rent payment due to the Landlord. The Late Fee shall accumulate
+    in accordance with the terms mentioned herein and Governing Law,
+    abiding by any statutory grace periods that may exist.
+
+j.  Move-In Inspection. A Move-In Inspection, if required under this
+    Agreement or Governing Law, shall be to protect the liability of the
+    Tenant and the Security Deposit. Both Parties must acknowledge the
+    Property's condition at the start and the end of the Term.
+
+k.  Notices. The official address used for legal communication between
+    the Landlord and Tenant as mentioned in Section 20.
+
+l.  NSF Fee. If a Non-Sufficient Funds (NSF) Fee is mentioned herein,
+    and if it is greater than the amount permitted under Governing Law,
+    the amount under Governing Law shall take precedent. If a
+    Non-Sufficient Funds (NSF) Fee is charged to the Tenant, it shall be
+    due and payable immediately.
+
+m.  Parking. Any Parking provided by the Landlord shall be at the
+    Tenant’s discretion. The Landlord is not responsible for any damage,
+    property loss, or liability that may occur to the Tenant’s vehicle
+    while parked in the described area.
+
+n.  Pets. If any property repairs, odor removal, or other maintenance is
+    required due to the Tenant’s Pets, the costs shall be deducted from
+    the Pet Fee or Security Deposit with an itemized list disclosed to
+    the Tenant.
+
+    i.  Pet Restrictions. Any pet restriction mentioned in this
+        Agreement shall be limited to Federal and State regulations
+        regarding Tenants with special protections and privileges.
+
+    ii. Protected Animals. Notwithstanding any other provisions of this
+        Agreement, the Tenant may keep a pet that qualifies as a service
+        animal under the Americans with Disabilities Act (ADA) or an
+        emotional support animal under applicable State and Federal
+        laws. Tenants must provide documentation verifying the animal’s
+        status as a service animal or emotional support animal upon
+        request.
+
+    iii. Procedure for Approval. A Tenant seeking to keep a service
+         animal or emotional support animal must notify the Landlord in
+         writing and provide the necessary documentation. The Landlord
+         shall not unreasonably withhold consent for a service animal or
+         emotional support animal based on legitimate documentation.
+
+    iv. Indemnification. The Tenant agrees to indemnify and hold
+        harmless the Landlord from any claims, damages, liabilities, or
+        expenses arising out of the actions of any Pet allowed on the
+        Property by the Tenant.
+
+o.  Pre-Payment of Rent. If applicable, the Pre-Payment of Rent is
+    applied to the dates mentioned herein. The Pre-Payment Period cannot
+    be applied to any other timeframe and is non-refundable. Therefore,
+    if the Tenant defaults on the terms of this Agreement and this
+    Agreement is terminated by the Landlord, they shall not be entitled
+    to a refund of the Pre-Payment of Rent.
+
+p.  Party or Parties. The Landlord and Tenant are each referred to
+    herein as a “Party” and, collectively, as the “Parties.”
+
+q.  Property. The Property is the residential space permitted to be
+    occupied by the Tenant and Occupants as outlined in Section 2.
+
+r.  Rent. The first payment of Rent shall be due and payable at the
+    execution of this Agreement. All subsequent Rent payments shall be
+    paid on the due date in accordance with the payment instructions set
+    forth under Section 4.
+
+s.  Renters Insurance. It is strongly recommended that the Tenant
+    secures a Renters Insurance policy to cover personal property, which
+    also includes personal liability for their actions. Unless there is
+    a prohibition imposed by the affordability covenants or other
+    restrictions applicable under Governing Law, if Renters Insurance is
+    required it must be issued by an insurance company that provides the
+    amount mentioned in Section 17.
+
+    i.  Proof of Insurance. The Tenant shall provide the Landlord with a
+        copy of the Renters Insurance policy declaration page or a
+        certificate of insurance prior to the commencement of the Term
+        and upon any renewal or change of the policy. The Tenant must
+        also provide proof of insurance within 10 days of any written
+        request by the Landlord as a requirement under this Agreement.
+
+    ii. Interested Party. In any Renters Insurance policy, the Landlord
+        must be named as an additional interested party.
+
+    iii. Policy Maintenance. The Tenant agrees to maintain the Renters
+         Insurance policy in full force and effect for the duration of
+         the Term and any renewals thereof. Failure to maintain the
+         required insurance constitutes a breach of this Agreement and
+         may result in termination of tenancy and eviction under local
+         housing laws.
+
+    iv. Landlord’s Insurance. Tenant acknowledges that the Landlord’s
+        insurance does not cover the Tenant’s personal property or
+        liability.
+
+    v.  Subrogation Waiver. The Renters Insurance policy shall include a
+        waiver of subrogation clause in favor of the Landlord, meaning
+        the insurance company of the Renters Insurance cannot seek
+        recovery from the Landlord for any claims paid under the Renters
+        Insurance.
+
+    vi. Failure to Maintain. If the Tenant fails to obtain and maintain
+        Renters Insurance as required under this Agreement, it shall be
+        considered a violation and result in default of this Agreement.
+
+t.  Security Deposit. If required, a Security Deposit is paid by the
+    Tenant to the Landlord at the execution of this Agreement under the
+    following terms:
+
+i.  Payment. Payment of the Security Deposit must be made at the
+    execution of this Agreement.
+
+ii. Returning to Tenant. The Security Deposit is returned to the Tenant
+    in accordance with the timeframe mentioned or Governing Law,
+    whichever is greater. The timeframe shall start upon the Tenant's
+    delivery and possession of the Property to the Landlord.
+
+iii. Receipt. If required under Governing Law or at the Landlord’s sole
+     discretion, the Landlord shall provide a receipt for the payment of
+     a Security Deposit which may include the location of where the
+     funds are held.
+
+iv. Interest. Unless required under Governing Law, the Security Deposit
+    shall not be placed in an interest-bearing bank account to the
+    benefit of the Tenant.
+
+v.  Separate Bank Account. If required under Governing Law, the Security
+    Deposit is required to be placed in a separate bank account.
+
+u.  Smoking Policy. Smoking, under this Agreement, is referred to using
+    a 3rd party device to inhale plant-based or non-plant-based
+    substances. This includes vaping or inhaling of any vapor-like
+    products.
+
+v.  Term. The Term shall be the period of time the Tenant and any
+    Occupants are permitted to reside on the Property as mentioned in
+    Section 3.
+
+w.  Utilities & Services. The Tenant is responsible for any Utilities &
+    Services not mentioned in Section 16 as the Landlord’s
+    responsibility.
+
+x.  Violation of this Agreement. If the Tenant violates this Agreement,
+    and more than one individual is named as a Tenant, they shall
+    jointly be liable for all obligations under this Agreement including
+    but not limited to Rent damage to the Property, outstanding utility
+    bills, and any other non-compliance.
+
+24. MISCELLANEOUS TERMS.
+
+a.  Active Military.
+
+    i.  Right to Terminate. Under the Servicemembers Civil Relief Act,
+        the Tenant has the right to terminate this Agreement under the
+        following conditions:
+
+        1)  Permanent Change of Station. If the Tenant’s station is
+            moved by 50 miles or more from the Property; or
+
+        2)  Deployment. If the Tenant is deployed with a military unit
+            for a period of not less than 90 days.
+
+    ii. Notice. For the Tenant to exercise termination under this
+        section, written notice of termination and a copy of the
+        official orders or a verification signed by the Tenant’s
+        commanding officer shall suffice.
+
+    iii. Termination Effective Date. Under such termination, it shall be
+         made effective 30 days after the first date on which the next
+         rental payment is due after the notice of termination is
+         delivered to the Landlord. No penalties or fees for early
+         termination shall be charged to the Tenant. However, the Tenant
+         is responsible for all Rent payments prior to the termination
+         date.
+
+    iv. Security Deposit. Upon such termination, the Landlord shall
+        return the amount paid by the Tenant as a Security Deposit in
+        accordance with this Agreement.
+
+b.  Alterations. The Tenant is not allowed to alter, modify, or change
+    the Property in any manner without the prior written consent of the
+    Landlord.
+
+c.  Compliance with Local Laws. The Tenant agrees, during the Term, to
+    adhere to all local, State, and Federal laws regarding any
+    ordinances, orders, rules, and regulations.
+
+d.  Delivery and Possession. To the best of their knowledge, the
+    Landlord declares to deliver possession of the Property in a
+    habitable condition with all utilities and services in working
+    order. This includes being free of any bedbugs, pests, mold, leaks,
+    or repairs needed that could affect the Tenant’s living standards.
+
+    i.  Returning to Landlord. Upon the termination of this Agreement,
+        the Tenant is obligated to return the Property in the same or
+        similar condition upon moving out, wear and tear excepted.
+
+e.  Dispute Resolution. Should a dispute arise from this Agreement, the
+    Parties agree to attempt an amicable resolution. If unresolved,
+    disputes shall be settled by binding arbitration within the
+    Governing Law, following the rules of a mutually agreed-upon
+    arbitration association. The prevailing Party may recover reasonable
+    attorneys’ fees. This Agreement is governed by the Governing Law
+    with the jurisdiction for any court process to be of the Landlord’s
+    preference in such area.
+
+f.  Equal Housing. If the Tenant possesses any mental or physical
+    impairment, the Landlord shall provide reasonable modifications to
+    the Property unless the modifications would be too difficult or
+    expensive for the Landlord to provide. Any impairments of the Tenant
+    are encouraged to be provided and presented to the Landlord in
+    writing to seek the most appropriate solution for providing
+    modifications to the Property.
+
+g.  Indemnification. The Tenant agrees to indemnify and hold the
+    Landlord harmless against all losses, damages, liabilities, claims,
+    and expenses (including attorneys’ fees) incurred by the Landlord
+    arising out of or related to the Tenant's use or occupancy of the
+    Property, except to the extent caused by the gross negligence or
+    willful misconduct of the Landlord. This indemnification shall
+    survive the termination of this Agreement.
+
+h.  Maintenance. Any maintenance required to maintain the Property’s
+    condition of habitability shall be the Landlord’s responsibility,
+    provided that it is not the result of the Tenant’s negligence.
+
+i.  Occupancy. Within 48 hours of the Tenant’s occupancy of the
+    Property, they accept that the Property is in working order and in a
+    habitable condition.
+
+j.  Right of Entry. The Landlord shall have the right to enter the
+    Property, in accordance with Governing law or by providing 24 hours’
+    notice, whichever is greater, for the following reasons:
+
+    i.  Maintenance and repairs;
+
+    ii. Inspections.
+
+    iii. Property showings.
+
+    iv. Lease violations.
+
+    v.  Emergencies.
+
+    vi. Per local, State, or Federal laws.
+
+k.  Right of Quiet Enjoyment. Both Parties shall have the right to quiet
+    enjoyment of the Property, which shall not be infringed upon.
+
+    i.  Tenant’s Right. The Tenant has the right to enjoy the Property
+        without disruptive interference from the Landlord or other
+        tenants. Any other disturbance outside the Landlord’s power to
+        mitigate shall be the responsibility of the Tenant to report to
+        the appropriate authorities and cooperate with the Landlord in
+        any reasonable measures to resolve the issue.
+
+    ii. Landlord’s Right. The Landlord and any other surrounding tenants
+        have the right to enjoy the Property without disruptive
+        interference by the Tenant. A violation of this section by the
+        Tenant shall be considered a breach of this Agreement.
+
+l.  Sale of Property. Upon the sale of the Property, the Landlord shall
+    forward the new owner’s contact information, and this Agreement
+    shall be assigned to the Landlord accordingly. This Agreement shall
+    continue in the event of a sale.
+
+m.  Severability. If any provision of this Agreement or the application
+    thereof shall, for any reason and to any extent, be invalid or
+    unenforceable, neither the remainder of this Agreement nor the
+    application of the provision to other persons, entities, or
+    circumstances shall be affected thereby, but instead shall be
+    enforced to the maximum extent permitted by law.
+
+n.  Subletting. If subletting is allowed, the Tenant acknowledges that
+    any subtenants must follow the rules, responsibilities, and
+    obligations under this Agreement and cannot occupy the Property
+    longer than the Term. The Tenant accepts that any damage to the
+    Property or any efforts to remove a subtenant shall be their sole
+    responsibility. Furthermore, if a subtenant refuses to vacate the
+    Property at the end of the Term, the Tenant shall be responsible for
+    removing the subtenant and any loss of Rent of the Landlord.
+
+    i.  Subletting Allowed with the Landlord’s Consent. If this option
+        is selected in Section 19, the Landlord must grant consent for
+        each subtenant allowed on the Property. Therefore, if the
+        Landlord’s consent is granted for a specific subtenant, it does
+        not automatically extend to additional subtenants.
+
+o.  Termination. If this Lease is not renewed or extended by mutual
+    written agreement of the Landlord and Tenant, the Agreement will
+    automatically terminate at 11:59 PM on the last day of the Term.
+    Tenant agrees to vacate and surrender possession of the Property to
+    the Landlord no later than 11:59 PM on the end date. Failure to
+    vacate the Property by the end of the Term may result in the Tenant
+    being deemed a holdover tenant, subject to additional rent and legal
+    consequences, as permitted by Governing Law. Tenant is required to
+    remove all personal belongings, leave the Property in good
+    condition, and return all keys and access devices to the Landlord
+    upon vacating.
+
+25. DEFAULT.
+
+a.  Tenant’s Default. A default by the Tenant shall occur if the Tenant
+    fails to pay Rent or any other payment required by this Agreement
+    the day after it is due, including any grace periods provided under
+    Governing Law. Default shall also occur if the Tenant violates any
+    other term or condition of this Agreement and fails to cure such
+    violation within 5 days after receiving written notice of the
+    violation from the Landlord, or the notice period as required under
+    Governing Law, whichever is greater. Upon default, the Landlord may
+    exercise any remedy available under this Agreement or Governing Law
+    including but not limited to the termination of this Agreement,
+    repossession of the Property, and initiation of legal proceedings to
+    recover unpaid Rent and other claimed damages.
+
+b.  Landlord’s Default. A default by the Landlord shall occur if the
+    Landlord fails to perform any of its obligations under this
+    Agreement, and such failure continues for 10 days after the Tenant
+    gives the Landlord written notice of such failure. Upon default, the
+    Tenant may exercise any remedy available under this Agreement or
+    applicable law including but not limited to the right to terminate
+    this Agreement, deduct the cost of repairs from future rent
+    payments, and seek damages or specific performance through legal
+    action.
+
+c.  Notice of Default. Any notice required under this section shall be
+    given in writing and shall be deemed sufficiently given if delivered
+    in person or sent by registered or certified mail, return receipt
+    requested, to the other Party at the address set forth in this
+    Agreement or to such other address as either Party may have provided
+    by written notice.
+
+26. PROHIBITED ACTIONS.
+
+a.  Assignment. The Tenant has no rights to assign this Agreement to any
+    other party unless written approval has been granted by the
+    Landlord. The Landlord is prohibited from assigning this Agreement
+    unless there is a change of Property ownership.
+
+b.  Hazardous Materials. The Tenant agrees not to possess, store, or use
+    any items or substances with flammable or explosive characteristics
+    on the Property including, but not limited to, gasoline, compressed
+    gases, kerosene, motor oil, fireworks, or any other substances
+    deemed ignitable or hazardous.
+
+c.  Illegal Activity. The Tenant agrees to comply with all applicable
+    laws, ordinances, and regulations. The Tenant, their Guests, and any
+    other Occupant shall not engage in any illegal activities anywhere
+    on the Property including, but not limited to, the leased Property,
+    Parking, and surrounding property. This prohibition extends to all
+    illegal activities including, but not limited to, the manufacture,
+    sale, distribution, use, or possession of illegal substances, theft,
+    and violent behavior. Any violation of this clause constitutes a
+    material breach of this Agreement and grounds for immediate
+    termination of tenancy and eviction. Additionally, the Tenant shall
+    be held liable for any damages resulting from such illegal
+    activities including, but not limited to, repairs, legal fees, loss
+    of rent, and any other expenses incurred by the Landlord due to the
+    Tenant's illegal activities.
+
+d.  Residential Use Only. The Tenant agrees to use the Property for
+    residential purposes only. The Landlord must grant written approval
+    if the Tenant uses the Property for any other purpose.
+
+e.  Waterbeds. The Tenant is prohibited from using any type of bed,
+    mattress, or sleeping aid containing any type of liquid that could
+    cause excessive damage to the Property.
+
+27. ENTIRE AGREEMENT. This Agreement constitutes the entire
+    understanding between the Parties with regard to the subjects
+    herein. It includes any attachments or addenda and supersedes all
+    prior negotiations, understandings, and agreements among the
+    Parties. Both Landlord and Tenant hereby acknowledge and agree to be
+    bound by the terms and conditions set forth until the expiration or
+    earlier termination of the Term.
+
+IN WITNESS WHEREOF, the Parties have executed this Agreement as of the
+date first above written. Each Party warrants that they have the legal
+authority to enter into this Agreement and have done so as their free
+act and deed.
+
+Landlord’s Signature: __________________________ Date: ____________
+
+Print Name: __________________________
+
+Tenant’s Signature: __________________________ Date: ____________
+
+Print Name: __________________________
+
+Tenant’s Signature: __________________________ Date: ____________
+
+Print Name: __________________________
+
+AMOUNT DUE AT SIGNING
+
+First (1^(st)) Month’s Rent: $[AMOUNT] (section 4)
+
+Security Deposit: $[AMOUNT] (section 5)
+
+Early Move-in (Proration Amount): $[AMOUNT] (section 8)
+
+Pre-Payment of Rent: $[AMOUNT] (section 9)
+
+Parking Fee: $[AMOUNT] (section 13)
+
+Pet Deposit: $[AMOUNT] (section 11)
+
+Total Amount Due: $[AMOUNT]
