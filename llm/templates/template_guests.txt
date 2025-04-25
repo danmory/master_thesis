@@ -1,0 +1,11 @@
+13. GUESTS. During the Lease Term, the Tenant is: (check one)
+
+☐ - Not Allowed to Have Guests.
+
+☐ - Allowed to Have Guests. Rules regarding guests are as follows:
+
+a. Maximum Number of Guests: [#]
+
+b. Maximum Stay: [#] Hours
+
+c. Other Rules: [DESCRIBE OTHER GUEST RULES]

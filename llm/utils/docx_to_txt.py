@@ -1,6 +1,5 @@
 import pypandoc
 
-import os
 from pathlib import Path
 
 docs_dir = Path('/Users/danila/Study/thesis/llm/docs')

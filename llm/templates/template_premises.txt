@@ -1,0 +1,15 @@
+2. THE PREMISES. The Landlord agrees to lease the described property
+below to the Tenant, and the Tenant agrees to rent from the
+Landlord:
+
+a. Mailing Address: [PROPERTY ADDRESS]
+
+b. Residence Type: ☐ Apartment ☐ House ☐ Condo ☐ Other: [OTHER]
+
+c. Bedroom(s): [#]
+
+d. Bathroom(s): [#]
+
+e. Other: [DESCRIBE]
+
+Hereinafter known as the “Premises.”
