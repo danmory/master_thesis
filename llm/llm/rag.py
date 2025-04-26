@@ -40,10 +40,10 @@ def splitter_node(text_splitter: TextSplitter):
     return split
 
 
-def retrieve_node(vector_store: VectorStore):
+def retriever_node(vector_store: VectorStore):
     retriever = vector_store.as_retriever(
         search_type="similarity",
-        search_kwargs={"k": 1},
+        search_kwargs={"k": 3},
     )
 
     def retrieve(state: State):
@@ -89,39 +89,25 @@ def retrieve_node(vector_store: VectorStore):
     return retrieve
 
 
-def generate_node(prompt: PromptTemplate, model: BaseLLM):
+def generator_node(prompt: PromptTemplate, model: BaseLLM):
     def generate(state: State):
         docs_content = "\n\n".join(
             doc.page_content for doc in state["context"])
-        messages = prompt.invoke(
-            {"question": state["question"], "context": docs_content})
-        response = model.invoke(messages)
+        formatted_prompt = prompt.format(
+            question=state["question"], context=docs_content
+        )
+        response = model.invoke(formatted_prompt)
         return {"answer": response}
     return generate
 
 
-def create_chain(vectorstore: VectorStore, model: BaseLLM, text_splitter: TextSplitter):
+def create_chain(vectorstore: VectorStore, model: BaseLLM, text_splitter: TextSplitter, template: str):
     print("Setting up RAG chain...")
-
-    template = """
-        You are an AI assistant specialized in generating Solidity smart contracts.
-        Use the following context, which consists of a text description from a legal agreement and its corresponding Solidity code template (separated by '--- Solidity Template ---'), to fulfill the user's request.
-        Generate a complete Solidity smart contract based on the user's request and the provided context.
-        Ensure the contract follows Solidity best practices. If the provided context is insufficient or irrelevant to the request, state that you cannot generate the contract based on the given information.
-
-        Context:
-        {context}
-
-        User Request:
-        {question}
-
-        Generated Solidity Contract:
-        """
 
     prompt = PromptTemplate.from_template(template)
 
-    retriever = retrieve_node(vectorstore)
-    generator = generate_node(prompt, model)
+    retriever = retriever_node(vectorstore)
+    generator = generator_node(prompt, model)
     input_splitter = splitter_node(text_splitter)
 
     graph_builder = StateGraph(State)
