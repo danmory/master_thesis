@@ -28,15 +28,15 @@ def create_vector_store(embeddings: Embeddings, documents: list[Document]) -> In
 
 
 class State(TypedDict):
-    question: str
-    question_chanks: list[str]
+    agreement_to_convert: str
+    agreement_to_convert_chanks: list[str]
     context: list[Document]
     answer: str
 
 
 def splitter_node(text_splitter: TextSplitter):
     def split(state: State):
-        return {"question_chanks": text_splitter.split_text(state["question"])}
+        return {"agreement_to_convert_chanks": text_splitter.split_text(state["agreement_to_convert"])}
     return split
 
 
@@ -49,7 +49,7 @@ def retriever_node(vector_store: VectorStore):
     def retrieve(state: State):
         print("Retrieving relevant documents...")
         retrieved_docs_nested = retriever.batch(
-            state["question_chanks"],
+            state["agreement_to_convert_chanks"],
         )
         # flatten
         all_docs = [doc for sublist in retrieved_docs_nested for doc in sublist]
@@ -64,15 +64,15 @@ def retriever_node(vector_store: VectorStore):
         print(
             f"Found {len(unique_docs_by_path)} unique documents based on source path.")
 
-        processed_docs = []
-        for source_path, doc in unique_docs_by_path.items():
+        processed_docs: list[Document] = []
+        for index, (source_path, doc) in enumerate(unique_docs_by_path.items()):
             if source_path and source_path.endswith(".txt"):
                 sol_path = source_path[:-4] + ".sol"
                 if os.path.exists(sol_path):
                     try:
                         with open(sol_path, 'r') as f:
                             solidity_content = f.read()
-                        combined_content = f"{doc.page_content}\n\n--- Solidity Template ---\n\n{solidity_content}"
+                        combined_content = f"\n\n --- Agreement part №{index} ---\n\n {doc.page_content}\n\n--- Solidity Template for №{index} ---\n\n{solidity_content}"
                         print(
                             f"Successfully loaded and combined template for: {source_path}")
                         processed_docs.append(
@@ -94,8 +94,9 @@ def generator_node(prompt: PromptTemplate, model: BaseLLM):
         docs_content = "\n\n".join(
             doc.page_content for doc in state["context"])
         formatted_prompt = prompt.format(
-            question=state["question"], context=docs_content
+            agreement_to_convert=state["agreement_to_convert"], context=docs_content
         )
+        print("Prompt: ", formatted_prompt)
         response = model.invoke(formatted_prompt)
         return {"answer": response}
     return generate
