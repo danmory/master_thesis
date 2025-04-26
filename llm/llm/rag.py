@@ -11,6 +11,32 @@ from langgraph.graph import StateGraph, START, END
 from typing import TypedDict
 
 
+def get_default_prompt_template():
+    return """
+    You are a smart contract developer tasked with converting legal agreements into Solidity code.
+    
+    # Current Agreement Chunk:
+    {current_chunk}
+    
+    # Relevant Templates and Examples:
+    {context}
+    
+    # Previously Generated Code (modify only if needed):
+    {generated_code}
+    
+    Instructions:
+    1. Analyze the current agreement chunk and identify any contractual terms that should be implemented in Solidity.
+    2. Use the provided templates and examples as reference for implementation patterns.
+    3. If Previously Generated Code is empty, create a new Solidity contract with appropriate structure.
+    4. If code has already been generated, ONLY add or modify the contract to implement the current chunk's requirements.
+    5. If the current chunk doesn't require any changes to the existing code, return the existing code unchanged.
+    6. Ensure the contract remains syntactically valid and coherent at all times.
+    7. Focus on implementing the specific terms from the current chunk only.
+    
+    Output ONLY the complete Solidity contract code with your modifications.
+    """
+
+
 def load_templates(directory_path: str) -> list[Document]:
     print(f"Loading templates from: {directory_path}")
     loader = DirectoryLoader(
@@ -29,14 +55,23 @@ def create_vector_store(embeddings: Embeddings, documents: list[Document]) -> In
 
 class State(TypedDict):
     agreement_to_convert: str
-    agreement_to_convert_chanks: list[str]
+    agreement_chunks: list[str]
+    current_chunk_index: int
     context: list[Document]
+    generated_code: str
     answer: str
+    done: bool
 
 
 def splitter_node(text_splitter: TextSplitter):
     def split(state: State):
-        return {"agreement_to_convert_chanks": text_splitter.split_text(state["agreement_to_convert"])}
+        chunks = text_splitter.split_text(state["agreement_to_convert"])
+        return {
+            "agreement_chunks": chunks,
+            "current_chunk_index": 0,
+            "generated_code": "",
+            "done": False
+        }
     return split
 
 
@@ -47,32 +82,26 @@ def retriever_node(vector_store: VectorStore):
     )
 
     def retrieve(state: State):
-        print("Retrieving relevant documents...")
-        retrieved_docs_nested = retriever.batch(
-            state["agreement_to_convert_chanks"],
-        )
-        # flatten
-        all_docs = [doc for sublist in retrieved_docs_nested for doc in sublist]
-
-        # remove duplicates
-        unique_docs_by_path: dict[str, Document] = {}
-        for doc in all_docs:
-            source_path = doc.metadata.get('source')
-            if source_path and source_path not in unique_docs_by_path:
-                unique_docs_by_path[source_path] = doc
+        if state["done"]:
+            return {}
 
         print(
-            f"Found {len(unique_docs_by_path)} unique documents based on source path.")
+            f"Processing chunk {state['current_chunk_index']+1}/{len(state['agreement_chunks'])}")
 
+        retrieved_docs = retriever.invoke(
+            state["agreement_chunks"][state["current_chunk_index"]])
+
+        # Process retrieved documents
         processed_docs: list[Document] = []
-        for index, (source_path, doc) in enumerate(unique_docs_by_path.items()):
+        for index, doc in enumerate(retrieved_docs):
+            source_path = doc.metadata.get('source')
             if source_path and source_path.endswith(".txt"):
                 sol_path = source_path[:-4] + ".sol"
                 if os.path.exists(sol_path):
                     try:
                         with open(sol_path, 'r') as f:
                             solidity_content = f.read()
-                        combined_content = f"\n\n --- Agreement part №{index} ---\n\n {doc.page_content}\n\n--- Solidity Template for №{index} ---\n\n{solidity_content}"
+                        combined_content = f"\n\n --- Agreement part {index} ---\n\n {doc.page_content}\n\n--- Solidity Template for {index} ---\n\n{solidity_content}"
                         print(
                             f"Successfully loaded and combined template for: {source_path}")
                         processed_docs.append(
@@ -91,35 +120,74 @@ def retriever_node(vector_store: VectorStore):
 
 def generator_node(prompt: PromptTemplate, model: BaseLLM):
     def generate(state: State):
+        if state["done"]:
+            return {}
+
         docs_content = "\n\n".join(
             doc.page_content for doc in state["context"])
+
         formatted_prompt = prompt.format(
-            agreement_to_convert=state["agreement_to_convert"], context=docs_content
+            current_chunk=state["agreement_chunks"][state["current_chunk_index"]],
+            context=docs_content,
+            generated_code=state["generated_code"]
         )
-        print("Prompt: ", formatted_prompt)
+
+        print(
+            f"Generating code for chunk {state['current_chunk_index']+1}/{len(state['agreement_chunks'])}")
         response = model.invoke(formatted_prompt)
-        return {"answer": response}
+        
+        print(f"Generated code for chunk {state['current_chunk_index']+1}/{len(state['agreement_chunks'])}: \n\n {response}")
+
+        return {"generated_code": response}
+
     return generate
 
 
-def create_chain(vectorstore: VectorStore, model: BaseLLM, text_splitter: TextSplitter, template: str):
-    print("Setting up RAG chain...")
+def router_node():
+    def route(state: State):
+        # Check if we've processed all chunks
+        if state["current_chunk_index"] >= len(state["agreement_chunks"]) - 1:
+            return {"done": True, "answer": state["generated_code"]}
+
+        # Move to the next chunk
+        next_index = state["current_chunk_index"] + 1
+        return {
+            "current_chunk_index": next_index,
+        }
+
+    return route
+
+
+def create_chain(vectorstore: VectorStore, model: BaseLLM, text_splitter: TextSplitter, template: str = get_default_prompt_template()):
+    print("Setting up iterative RAG chain...")
 
     prompt = PromptTemplate.from_template(template)
 
+    # Define nodes
+    input_splitter = splitter_node(text_splitter)
     retriever = retriever_node(vectorstore)
     generator = generator_node(prompt, model)
-    input_splitter = splitter_node(text_splitter)
+    router = router_node()
 
+    # Build the graph
     graph_builder = StateGraph(State)
+
     graph_builder.add_node("input_splitter", input_splitter)
     graph_builder.add_node("retriever", retriever)
     graph_builder.add_node("generator", generator)
+    graph_builder.add_node("router", router)
 
+    # Define the workflow
     graph_builder.add_edge(START, "input_splitter")
     graph_builder.add_edge("input_splitter", "retriever")
     graph_builder.add_edge("retriever", "generator")
-    graph_builder.add_edge("generator", END)
+    graph_builder.add_edge("generator", "router")
+
+    # Conditional edges
+    graph_builder.add_conditional_edges(
+        "router",
+        lambda state: END if state["done"] else "retriever"
+    )
 
     print("RAG chain setup complete.")
 
