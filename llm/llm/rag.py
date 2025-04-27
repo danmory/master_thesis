@@ -1,4 +1,5 @@
 import os
+from venv import logger
 from langchain_community.document_loaders import DirectoryLoader, TextLoader
 from langchain_community.vectorstores import InMemoryVectorStore
 from langchain_core.documents import Document
@@ -12,30 +13,29 @@ from typing import TypedDict
 import re
 
 
-def get_default_prompt_template():
-    return """
+DEFAULT_PROMPT = """
     You are a smart contract developer tasked with converting legal agreements into Solidity code.
     
-    # Current Agreement Chunk:
+    # Convert this Agreement Chunk:
     {current_chunk}
     
-    # Relevant Templates and Their Solidity implementation:
+    # These Relevant Templates and Their Solidity implementation may help:
     {context}
     
-    # Previously Generated Code (modify only if needed):
+    # Already Generated Code (modify only if needed):
     {generated_code}
     
     Instructions:
     1. Analyze the current agreement chunk and identify any contractual terms that should be implemented in Solidity.
     2. Use the provided templates and their implementation as reference for implementation patterns.
-    3. If Previously Generated Code is empty, create a new Solidity contract with name 'Agreement' and appropriate structure.
-    4. If code has already been generated, ONLY add or modify code of the 'Agreement' contract to implement the current chunk's requirements.
-    5. Set state variables to values that you can find on the agreement, e.g. start dates, rent amount, etc.
+    3. If Already Generated Code is empty, create a new Solidity contract with name 'Agreement' and appropriate structure.
+    4. If code has already been generated, ONLY modify code of the 'Agreement' contract to implement the current chunk's requirements.
+    5. Initialize state variables with values found on the agreement, e.g. start dates, rent amount, etc.
     6. If the current chunk doesn't require any changes to the existing code, return the existing code unchanged.
     7. Ensure the contract remains syntactically valid and coherent at all times.
     8. Focus on implementing the specific terms from the current chunk only.
     
-    Output ONLY the SINGLE complete Solidity contract code with your modifications.
+    Output ONLY the SINGLE complete Solidity contract code with your modifications without any comments and any other information.
     """
 
 
@@ -141,10 +141,12 @@ def generator_node(prompt: PromptTemplate, model: BaseLLM):
         match = re.search(r"```solidity\n(.*?)\n```", response, re.DOTALL)
         if match:
             extracted_code = match.group(1).strip()
-            print(f"Extracted Solidity code for chunk {state['current_chunk_index']+1}/{len(state['agreement_chunks'])}: \n\n {extracted_code}")
+            print(
+                f"Extracted Solidity code for chunk {state['current_chunk_index']+1}/{len(state['agreement_chunks'])}: \n\n {extracted_code}")
             return {"generated_code": extracted_code}
         else:
-            print(f"Could not extract Solidity code from response for chunk {state['current_chunk_index']+1}/{len(state['agreement_chunks'])}. Using full response.")
+            print(
+                f"Could not extract Solidity code from response for chunk {state['current_chunk_index']+1}/{len(state['agreement_chunks'])}. Using full response.")
             print(f"Full response: \n\n {response}")
             # Fallback to using the full response if extraction fails, or handle error as needed
             return {"generated_code": response}
@@ -167,7 +169,32 @@ def router_node():
     return route
 
 
-def create_chain(vectorstore: VectorStore, model: BaseLLM, text_splitter: TextSplitter, template: str = get_default_prompt_template()):
+def logger_node(log_dir: str = "./logs"):
+    def log(state: State):
+        os.makedirs(log_dir, exist_ok=True)
+
+        log_content = (
+            f"Processing Step {state['current_chunk_index'] + 1}\n"
+            f"{'=' * 50}\n\n"
+            f"Current Agreement Chunk:\n{state['agreement_chunks'][state['current_chunk_index']]}\n\n"
+            f"{'=' * 50}\n\n"
+            f"Relevant Templates and Their Solidity implementation:\n\n"
+            f"{"\n".join(map(lambda d: d.page_content, state['context']))}\n\n"
+            f"{'=' * 50}\n\n"
+            f"Generated Solidity Code:\n{state['generated_code']}\n"
+        )
+
+        log_path = os.path.join(
+            log_dir, f"step_{state['current_chunk_index']}.log")
+        with open(log_path, "w") as f:
+            f.write(log_content)
+
+        return state
+
+    return log
+
+
+def create_chain(vectorstore: VectorStore, model: BaseLLM, text_splitter: TextSplitter, template: str = DEFAULT_PROMPT):
     print("Setting up iterative RAG chain...")
 
     prompt = PromptTemplate.from_template(template)
@@ -177,6 +204,7 @@ def create_chain(vectorstore: VectorStore, model: BaseLLM, text_splitter: TextSp
     retriever = retriever_node(vectorstore)
     generator = generator_node(prompt, model)
     router = router_node()
+    logger = logger_node()
 
     # Build the graph
     graph_builder = StateGraph(State)
@@ -185,12 +213,14 @@ def create_chain(vectorstore: VectorStore, model: BaseLLM, text_splitter: TextSp
     graph_builder.add_node("retriever", retriever)
     graph_builder.add_node("generator", generator)
     graph_builder.add_node("router", router)
+    graph_builder.add_node("logger", logger)
 
     # Define the workflow
     graph_builder.add_edge(START, "input_splitter")
     graph_builder.add_edge("input_splitter", "retriever")
     graph_builder.add_edge("retriever", "generator")
-    graph_builder.add_edge("generator", "router")
+    graph_builder.add_edge("generator", "logger")
+    graph_builder.add_edge("logger", "router")
 
     # Conditional edges
     graph_builder.add_conditional_edges(
