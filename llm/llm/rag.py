@@ -26,16 +26,13 @@ DEFAULT_PROMPT = """
     {generated_code}
     
     Instructions:
-    1. Analyze the current agreement chunk and identify any contractual terms that should be implemented in Solidity.
-    2. Use the provided templates and their implementation as reference for implementation patterns.
-    3. If Already Generated Code is empty, create a new Solidity contract with name 'Agreement' and appropriate structure.
-    4. If code has already been generated, ONLY modify code of the 'Agreement' contract to implement the current chunk's requirements.
-    5. Initialize state variables with values found on the agreement, e.g. start dates, rent amount, etc.
-    6. If the current chunk doesn't require any changes to the existing code, return the existing code unchanged.
-    7. Ensure the contract remains syntactically valid and coherent at all times.
-    8. Focus on implementing the specific terms from the current chunk only.
+    1. Analyze the current agreement chunk and identify principal contractual terms that should be implemented in Solidity.
+    2. Use relevant templates as reference for implementation.
+    3. ONLY modify code of the 'Agreement' contract to implement the current chunk's requirements.
+    4. Pay attention to all numbers and dates found on the agreement. Initialize state variables with values found on the agreement, e.g. start dates, rent amount, etc.
+    5. Focus on implementing the specific terms from the current chunk only.
     
-    Output ONLY the SINGLE complete Solidity contract code with your modifications without any comments and any other information.
+    Output ONLY the SINGLE complete smart contract 'Agreement" with your modifications without any comments and any other information.
     """
 
 
@@ -71,7 +68,7 @@ def splitter_node(text_splitter: TextSplitter):
         return {
             "agreement_chunks": chunks,
             "current_chunk_index": 0,
-            "generated_code": "",
+            "generated_code": "//SPDX-License-Identifier: UNLICENSED\n\npragma solidity ^0.8.0;\n\ncontract Agreement {\n\n}",
             "done": False
         }
     return split
