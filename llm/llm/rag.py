@@ -9,6 +9,7 @@ from langchain_core.vectorstores import VectorStore
 from langchain_text_splitters import TextSplitter
 from langgraph.graph import StateGraph, START, END
 from typing import TypedDict
+import re
 
 
 def get_default_prompt_template():
@@ -18,7 +19,7 @@ def get_default_prompt_template():
     # Current Agreement Chunk:
     {current_chunk}
     
-    # Relevant Templates and Examples:
+    # Relevant Templates and Their Solidity implementation:
     {context}
     
     # Previously Generated Code (modify only if needed):
@@ -26,14 +27,15 @@ def get_default_prompt_template():
     
     Instructions:
     1. Analyze the current agreement chunk and identify any contractual terms that should be implemented in Solidity.
-    2. Use the provided templates and examples as reference for implementation patterns.
-    3. If Previously Generated Code is empty, create a new Solidity contract with appropriate structure.
-    4. If code has already been generated, ONLY add or modify the contract to implement the current chunk's requirements.
-    5. If the current chunk doesn't require any changes to the existing code, return the existing code unchanged.
-    6. Ensure the contract remains syntactically valid and coherent at all times.
-    7. Focus on implementing the specific terms from the current chunk only.
+    2. Use the provided templates and their implementation as reference for implementation patterns.
+    3. If Previously Generated Code is empty, create a new Solidity contract with name 'Agreement' and appropriate structure.
+    4. If code has already been generated, ONLY add or modify code of the 'Agreement' contract to implement the current chunk's requirements.
+    5. Set state variables to values that you can find on the agreement, e.g. start dates, rent amount, etc.
+    6. If the current chunk doesn't require any changes to the existing code, return the existing code unchanged.
+    7. Ensure the contract remains syntactically valid and coherent at all times.
+    8. Focus on implementing the specific terms from the current chunk only.
     
-    Output ONLY the complete Solidity contract code with your modifications.
+    Output ONLY the SINGLE complete Solidity contract code with your modifications.
     """
 
 
@@ -91,7 +93,6 @@ def retriever_node(vector_store: VectorStore):
         retrieved_docs = retriever.invoke(
             state["agreement_chunks"][state["current_chunk_index"]])
 
-        # Process retrieved documents
         processed_docs: list[Document] = []
         for index, doc in enumerate(retrieved_docs):
             source_path = doc.metadata.get('source')
@@ -135,10 +136,18 @@ def generator_node(prompt: PromptTemplate, model: BaseLLM):
         print(
             f"Generating code for chunk {state['current_chunk_index']+1}/{len(state['agreement_chunks'])}")
         response = model.invoke(formatted_prompt)
-        
-        print(f"Generated code for chunk {state['current_chunk_index']+1}/{len(state['agreement_chunks'])}: \n\n {response}")
 
-        return {"generated_code": response}
+        # Extract Solidity code block
+        match = re.search(r"```solidity\n(.*?)\n```", response, re.DOTALL)
+        if match:
+            extracted_code = match.group(1).strip()
+            print(f"Extracted Solidity code for chunk {state['current_chunk_index']+1}/{len(state['agreement_chunks'])}: \n\n {extracted_code}")
+            return {"generated_code": extracted_code}
+        else:
+            print(f"Could not extract Solidity code from response for chunk {state['current_chunk_index']+1}/{len(state['agreement_chunks'])}. Using full response.")
+            print(f"Full response: \n\n {response}")
+            # Fallback to using the full response if extraction fails, or handle error as needed
+            return {"generated_code": response}
 
     return generate
 

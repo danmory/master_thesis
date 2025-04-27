@@ -17,11 +17,9 @@ with open(agreement_path, 'r') as file:
 model = LlamaCpp(
     model_path=model_path_str,
     n_gpu_layers=-1,
-    n_batch=16,
+    # n_batch=16,
     n_ctx=8192,
-    temperature=0.75,
     max_tokens=2500,
-    top_p=1,
 )
 
 templates = rag.load_templates(templates_path)
