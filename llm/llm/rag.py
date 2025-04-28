@@ -28,7 +28,7 @@ DEFAULT_PROMPT = """
     {current_chunk}
     
     Strict Rules:
-    1. ONLY add new state variables and methods - never modify/remove existing code
+    1. ONLY add new state variables and methods - never remove existing code. Name them using best practices and naming conventions.
     2. Initialize variables with exact values from the agreement chunk (dates, amounts, etc)
     3. For payment-related terms, create methods with:
        - require() checks for amounts/dates
@@ -36,6 +36,8 @@ DEFAULT_PROMPT = """
        - corresponding events
     4. Skip creating methods to modify variables unless explicitly required
     5. Implement only what's in current chunk - ignore unrelated terms
+    6. Keep all state variables at the top, and methods at the bottom
+    7. Keep contract syntactically correct all the time.
     
     Output ONLY the complete 'Agreement' contract with your additions in plain Solidity code (no comments/explanations).
     """
@@ -73,7 +75,7 @@ def splitter_node(text_splitter: TextSplitter):
         return {
             "agreement_chunks": chunks,
             "current_chunk_index": 0,
-            "generated_code": "//SPDX-License-Identifier: UNLICENSED\n\npragma solidity ^0.8.0;\n\ncontract Agreement {\n\n}",
+            "generated_code": "pragma solidity ^0.8.0;\n\ncontract Agreement {\n\n}",
             "done": False
         }
     return split
@@ -219,6 +221,8 @@ def compile_node(model: BaseLLM):
 
                     Please fix the following contract:
                     {current_code}
+
+                    Most often, the contract is missing variable declarations. Add them if you encounter one.
 
                     Output ONLY the complete fixed Solidity contract without any comments or explanations.
                 """
