@@ -1,10 +1,3 @@
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
-
-/**
- * @title PartiesTemplate
- * @dev Represents the parties involved from Section 1 of the Short-Term Rental Agreement.
- */
 contract PartiesTemplate {
     // Landlord Information
     string public landlordName;
@@ -22,7 +15,4 @@ contract PartiesTemplate {
 
     // Agreement Date
     uint256 public agreementDate; // Unix timestamp
-
-    // Note: Actual implementation might involve roles, permissions, and identity verification.
-    // This template primarily defines the data structure for the involved parties.
 }

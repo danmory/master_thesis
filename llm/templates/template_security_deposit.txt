@@ -1,10 +1,7 @@
 4. SECURITY DEPOSIT. The Tenant shall be obligated to pay the following
-amounts upon the execution of this Agreement: (check one)
+amounts upon the execution of this Agreement:
 
-☐ - No Security Deposit: There is no deposit required for the security
-of this Agreement (“Security Deposit”).
-
-☐ - Security Deposit: $[SECURITY DEPOSIT AMOUNT] (“Security Deposit”).
+☑ - Security Deposit: $100 (“Security Deposit”).
 The Security Deposit is for the faithful performance of the Tenant
 under the terms and conditions of this Agreement. The Tenant must pay
 the Security Deposit at the execution of this Agreement. The Security

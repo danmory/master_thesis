@@ -1,0 +1,9 @@
+11. PROPERTY MANAGER. The Landlord: (check one)
+
+☑ - Has a Property Manager.
+
+Property Manager’s Name: John Doe
+
+Property Manager’s Telephone: 987-654-3210
+
+Property Manager’s E-Mail: manager@example.com

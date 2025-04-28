@@ -1,0 +1,5 @@
+8. PARKING. The Landlord:
+
+☑ - Shall Not Provide Parking.
+
+Mock Data: No parking spaces are allocated.

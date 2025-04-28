@@ -1,0 +1,7 @@
+11. PROPERTY MANAGER. The Landlord: (check one)
+
+☑ - Does Not Have a Property Manager.
+
+Landlord’s Telephone: John Doe
+
+Landlord’s E-Mail: "landlord@example.com"

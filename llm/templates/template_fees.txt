@@ -1,8 +1,8 @@
 9. FEES. The Landlord requires the Tenant pays the following fees at
 the execution of this Agreement: (check all that apply)
 
-☐ - Cleaning Fee: $[CLEANING FEE AMOUNT]
+☑ - Cleaning Fee: $5
 
-☐ - Taxes: $[TAXES AMOUNT]
+☑ - Taxes: $10
 
-☐ - Other: [DESCRIBE] $[AMOUNT]
+☑ - Other: parking $14
