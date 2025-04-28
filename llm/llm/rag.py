@@ -1,5 +1,8 @@
 import os
-from venv import logger
+import re
+from typing import TypedDict
+
+
 from langchain_community.document_loaders import DirectoryLoader, TextLoader
 from langchain_community.vectorstores import InMemoryVectorStore
 from langchain_core.documents import Document
@@ -9,30 +12,32 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.vectorstores import VectorStore
 from langchain_text_splitters import TextSplitter
 from langgraph.graph import StateGraph, START, END
-from typing import TypedDict
-import re
+from solcx import compile_source
 
 
 DEFAULT_PROMPT = """
-    You are a smart contract developer tasked with converting legal agreements into Solidity code.
+    You are a smart contract developer converting legal agreements to Solidity code.
     
-    # Convert this Agreement Chunk:
-    {current_chunk}
-    
-    # These Relevant Templates and Their Solidity implementation may help:
+    # Relevant templates and implementations:
     {context}
     
-    # Already Generated Code (modify only if needed):
+    # Current Agreement State:
     {generated_code}
     
-    Instructions:
-    1. Analyze the current agreement chunk and identify principal contractual terms that should be implemented in Solidity.
-    2. Use relevant templates as reference for implementation.
-    3. ONLY modify code of the 'Agreement' contract to implement the current chunk's requirements.
-    4. Pay attention to all numbers and dates found on the agreement. Initialize state variables with values found on the agreement, e.g. start dates, rent amount, etc.
-    5. Focus on implementing the specific terms from the current chunk only.
+    # Agreement Chunk to Implement:
+    {current_chunk}
     
-    Output ONLY the SINGLE complete smart contract 'Agreement" with your modifications without any comments and any other information.
+    Strict Rules:
+    1. ONLY add new state variables and methods - never modify/remove existing code
+    2. Initialize variables with exact values from the agreement chunk (dates, amounts, etc)
+    3. For payment-related terms, create methods with:
+       - require() checks for amounts/dates
+       - access controls (onlyOwner or similar)
+       - corresponding events
+    4. Skip creating methods to modify variables unless explicitly required
+    5. Implement only what's in current chunk - ignore unrelated terms
+    
+    Output ONLY the complete 'Agreement' contract with your additions in plain Solidity code (no comments/explanations).
     """
 
 
@@ -134,18 +139,11 @@ def generator_node(prompt: PromptTemplate, model: BaseLLM):
             f"Generating code for chunk {state['current_chunk_index']+1}/{len(state['agreement_chunks'])}")
         response = model.invoke(formatted_prompt)
 
-        # Extract Solidity code block
         match = re.search(r"```solidity\n(.*?)\n```", response, re.DOTALL)
         if match:
             extracted_code = match.group(1).strip()
-            print(
-                f"Extracted Solidity code for chunk {state['current_chunk_index']+1}/{len(state['agreement_chunks'])}: \n\n {extracted_code}")
             return {"generated_code": extracted_code}
         else:
-            print(
-                f"Could not extract Solidity code from response for chunk {state['current_chunk_index']+1}/{len(state['agreement_chunks'])}. Using full response.")
-            print(f"Full response: \n\n {response}")
-            # Fallback to using the full response if extraction fails, or handle error as needed
             return {"generated_code": response}
 
     return generate
@@ -153,11 +151,9 @@ def generator_node(prompt: PromptTemplate, model: BaseLLM):
 
 def router_node():
     def route(state: State):
-        # Check if we've processed all chunks
         if state["current_chunk_index"] >= len(state["agreement_chunks"]) - 1:
             return {"done": True, "answer": state["generated_code"]}
 
-        # Move to the next chunk
         next_index = state["current_chunk_index"] + 1
         return {
             "current_chunk_index": next_index,
@@ -182,7 +178,7 @@ def logger_node(log_dir: str = "./logs"):
         )
 
         log_path = os.path.join(
-            log_dir, f"step_{state['current_chunk_index']}.log")
+            log_dir, f"step_{state['current_chunk_index'] + 1}.log")
         with open(log_path, "w") as f:
             f.write(log_content)
 
@@ -191,19 +187,65 @@ def logger_node(log_dir: str = "./logs"):
     return log
 
 
+def compile_node(model: BaseLLM):
+    def compile(state: State):
+        if not state["done"]:
+            return {}
+
+        max_retries = 3
+        retry_count = 0
+        current_code = state["generated_code"]
+
+        while retry_count <= max_retries:
+            try:
+                compile_source(current_code)
+                print(
+                    f"Contract compiled successfully at step {state['current_chunk_index'] + 1}.")
+                return {"generated_code": current_code}
+            except FileNotFoundError as e:
+                raise e
+            except Exception as e:
+                retry_count += 1
+                if retry_count > max_retries:
+                    print(
+                        f"Max retries ({max_retries}) reached, returning generated code.")
+                    return {"generated_code": current_code}
+
+                print(
+                    f"Error during compilation (attempt {retry_count}/{max_retries}), fixing...")
+                fix_prompt = f"""
+                    The generated Solidity contract failed to compile with these errors:
+                    {str(e)}
+
+                    Please fix the following contract:
+                    {current_code}
+
+                    Output ONLY the complete fixed Solidity contract without any comments or explanations.
+                """
+                fixed_code = model.invoke(fix_prompt)
+
+                match = re.search(r"```solidity\n(.*?)\n```",
+                                  fixed_code, re.DOTALL)
+                if match:
+                    current_code = match.group(1).strip()
+
+                print(f"Contract fixed attempt {retry_count}")
+
+    return compile
+
+
 def create_chain(vectorstore: VectorStore, model: BaseLLM, text_splitter: TextSplitter, template: str = DEFAULT_PROMPT):
     print("Setting up iterative RAG chain...")
 
     prompt = PromptTemplate.from_template(template)
 
-    # Define nodes
     input_splitter = splitter_node(text_splitter)
     retriever = retriever_node(vectorstore)
     generator = generator_node(prompt, model)
     router = router_node()
     logger = logger_node()
+    compiler = compile_node(model)
 
-    # Build the graph
     graph_builder = StateGraph(State)
 
     graph_builder.add_node("input_splitter", input_splitter)
@@ -211,6 +253,7 @@ def create_chain(vectorstore: VectorStore, model: BaseLLM, text_splitter: TextSp
     graph_builder.add_node("generator", generator)
     graph_builder.add_node("router", router)
     graph_builder.add_node("logger", logger)
+    graph_builder.add_node("compiler", compiler)
 
     # Define the workflow
     graph_builder.add_edge(START, "input_splitter")
@@ -218,10 +261,11 @@ def create_chain(vectorstore: VectorStore, model: BaseLLM, text_splitter: TextSp
     graph_builder.add_edge("retriever", "generator")
     graph_builder.add_edge("generator", "logger")
     graph_builder.add_edge("logger", "router")
+    graph_builder.add_edge("router", "compiler")
 
     # Conditional edges
     graph_builder.add_conditional_edges(
-        "router",
+        "compiler",
         lambda state: END if state["done"] else "retriever"
     )
 
