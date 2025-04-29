@@ -31,20 +31,22 @@ DEFAULT_PROMPT = """
     1. As a lawyer, analyze agreement chunk and think what should be included into smart contract.
     2. As a lawyer, analyze how payments and changes to the signed agreement should be handled in smart contract and what checks are required.
     3. As an ordinary human, analyze what names should be used for state variables and methods in order to be understandable.
-    4. As a smart contract developer, add the necessary state variables and methods to the contract.
-    5. As a smart contract developer, make sure the contract is syntactically correct. 
+    4. As an analytic, analyze how relevant templates are implemented and what parts of agreement are transferred to smart contract.
+    5. As a smart contract developer, add the necessary state variables to smart contract. Add methods only if required.
+    6. As a smart contract developer, make sure the contract is syntactically correct and aligns with the rules below:
     
     Rules:
-    1. ONLY add new state variables and methods - never remove existing code. Name them using best practices and naming conventions.
-    2. Initialize variables with exact values from the agreement chunk (dates, amounts, etc)
-    3. For payment-related terms, create methods with:
+    1. ONLY ADD new state variables and methods
+    2. NEVER remove existing code!!!
+    3. Initialize variables with exact values from the agreement chunk (dates, amounts, etc)
+    4. For payment-related terms, create methods with:
        - require() checks for amounts/dates
-       - access controls (onlyOwner or similar)
+       - access controls
        - corresponding events
-    4. Skip creating methods to modify variables unless explicitly required
-    5. Implement only what's in current chunk - ignore unrelated terms
-    6. Keep all state variables at the top, and methods at the bottom
-    7. Keep contract syntactically correct all the time.
+    5. Skip creating methods to modify variables unless explicitly required
+    6. Implement only what's in current chunk - ignore unrelated terms
+    7. Keep all state variables at the top, and methods at the bottom
+    8. Keep contract syntactically correct all the time.
     
     Output the complete 'Agreement' contract with your additions in plain Solidity code (no comments/explanations).
     """
@@ -221,7 +223,7 @@ def compile_node(model: BaseLLM):
                     return {"generated_code": current_code}
 
                 print(
-                    f"Error during compilation (attempt {retry_count}/{max_retries}), fixing...")
+                    f"Error during compilation (attempt {retry_count}/{max_retries}), fixing the error:\n {str(e)}\n")
                 fix_prompt = f"""
                     The generated Solidity contract failed to compile with these errors:
                     {str(e)}
@@ -229,9 +231,15 @@ def compile_node(model: BaseLLM):
                     Please fix the following contract:
                     {current_code}
 
-                    Most often, the contract is missing variable declarations. Add them if you encounter one.
-
-                    Output ONLY the complete fixed Solidity contract without any comments or explanations.
+                    Instructions:
+                    1. Collect all errors and analyze them(they start with Error: <description>).
+                    2. For each error identify what part of the contract causes the error.
+                    3. Fix the identified part of the contract.
+                    4. Pay attention to duplicated constructors, methods and state variables. Initialize non-existing variables. Add visibility identifiers if needed. Use only Solidity types and syntax.
+                    5. Make sure the contract is syntactically correct.
+                    6. Repeat steps for all errors.
+                
+                    Output ONLY the fixed Solidity contract without any comments or explanations.
                 """
                 fixed_code = model.invoke(fix_prompt)
 
