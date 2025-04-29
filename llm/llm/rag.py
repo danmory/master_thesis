@@ -16,18 +16,25 @@ from solcx import compile_source
 
 
 DEFAULT_PROMPT = """
-    You are a smart contract developer converting legal agreements to Solidity code.
+    You are a smart contract developer converting legal rental agreements to Solidity smart contracts.
     
     # Relevant templates and implementations:
     {context}
     
-    # Current Agreement State:
+    # Current Smart Contract State:
     {generated_code}
     
-    # Agreement Chunk to Implement:
+    # Agreement Chunk to Add into Smart Contract:
     {current_chunk}
     
-    Strict Rules:
+    Instructions:
+    1. As a lawyer, analyze agreement chunk and think what should be included into smart contract.
+    2. As a lawyer, analyze how payments and changes to the signed agreement should be handled in smart contract and what checks are required.
+    3. As an ordinary human, analyze what names should be used for state variables and methods in order to be understandable.
+    4. As a smart contract developer, add the necessary state variables and methods to the contract.
+    5. As a smart contract developer, make sure the contract is syntactically correct. 
+    
+    Rules:
     1. ONLY add new state variables and methods - never remove existing code. Name them using best practices and naming conventions.
     2. Initialize variables with exact values from the agreement chunk (dates, amounts, etc)
     3. For payment-related terms, create methods with:
@@ -39,7 +46,7 @@ DEFAULT_PROMPT = """
     6. Keep all state variables at the top, and methods at the bottom
     7. Keep contract syntactically correct all the time.
     
-    Output ONLY the complete 'Agreement' contract with your additions in plain Solidity code (no comments/explanations).
+    Output the complete 'Agreement' contract with your additions in plain Solidity code (no comments/explanations).
     """
 
 
