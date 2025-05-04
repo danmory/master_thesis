@@ -1,6 +1,7 @@
 import os
 import re
 from typing import TypedDict
+from pathlib import Path
 
 
 from langchain_community.document_loaders import DirectoryLoader, TextLoader
@@ -13,6 +14,8 @@ from langchain_core.vectorstores import VectorStore
 from langchain_text_splitters import TextSplitter
 from langgraph.graph import StateGraph, START, END
 from solcx import compile_source
+
+from test_generator import TestGenerator, TestConfig
 
 
 DEFAULT_PROMPT = """
@@ -76,6 +79,8 @@ class State(TypedDict):
     generated_code: str
     answer: str
     done: bool
+    test_results: str
+    test_success: bool
 
 
 def splitter_node(text_splitter: TextSplitter):
@@ -253,6 +258,47 @@ def compile_node(model: BaseLLM):
     return compile
 
 
+def test_node(model: BaseLLM):
+    def test(state: State):
+        if not state["done"] or not state["generated_code"]:
+            return {}
+
+        test_dir = Path(os.path.dirname(os.path.abspath(__file__))) / "temp_test"
+        config = TestConfig(test_dir=test_dir)
+        test_generator = TestGenerator(config)
+
+        try:
+            contract_path = test_generator.save_contract(state["generated_code"])
+
+            test_prompt = test_generator.generate_test_prompt(
+                state["generated_code"],
+                state["agreement_to_convert"]
+            )
+            print("Invoking test prompt...")
+            test_code = model.invoke(test_prompt)
+
+            test_path = test_generator.save_test_file(test_code)
+
+            if not test_generator.wait_for_human_review(contract_path, test_path):
+                return {
+                    "test_results": "Testing cancelled by user",
+                    "test_success": False
+                }
+
+            result = test_generator.run_tests()
+
+            print(f"Test success: {result['success']}, output: {result['output']}")
+            return {
+                "test_results": result["output"],
+                "test_success": result["success"]
+            }
+
+        finally:
+            test_generator.cleanup()
+
+    return test
+
+
 def create_chain(vectorstore: VectorStore, model: BaseLLM, text_splitter: TextSplitter, template: str = DEFAULT_PROMPT):
     print("Setting up iterative RAG chain...")
 
@@ -264,6 +310,7 @@ def create_chain(vectorstore: VectorStore, model: BaseLLM, text_splitter: TextSp
     router = router_node()
     logger = logger_node()
     compiler = compile_node(model)
+    tester = test_node(model)
 
     graph_builder = StateGraph(State)
 
@@ -273,6 +320,7 @@ def create_chain(vectorstore: VectorStore, model: BaseLLM, text_splitter: TextSp
     graph_builder.add_node("router", router)
     graph_builder.add_node("logger", logger)
     graph_builder.add_node("compiler", compiler)
+    graph_builder.add_node("tester", tester)
 
     # Define the workflow
     graph_builder.add_edge(START, "input_splitter")
@@ -281,10 +329,11 @@ def create_chain(vectorstore: VectorStore, model: BaseLLM, text_splitter: TextSp
     graph_builder.add_edge("generator", "logger")
     graph_builder.add_edge("logger", "router")
     graph_builder.add_edge("router", "compiler")
+    graph_builder.add_edge("compiler", "tester")
 
     # Conditional edges
     graph_builder.add_conditional_edges(
-        "compiler",
+        "tester",
         lambda state: END if state["done"] else "retriever"
     )
 
