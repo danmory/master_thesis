@@ -8,7 +8,7 @@ from langchain_community.document_loaders import DirectoryLoader, TextLoader
 from langchain_community.vectorstores import InMemoryVectorStore
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
-from langchain_core.language_models import BaseLLM
+from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts import PromptTemplate
 from langchain_core.vectorstores import VectorStore
 from langchain_text_splitters import TextSplitter
@@ -42,7 +42,7 @@ DEFAULT_PROMPT = """
     1. ONLY ADD new state variables and methods
     2. NEVER remove existing code!!!
     3. Initialize variables with exact values from the agreement chunk (dates, amounts, etc)
-    4. For payment-related terms, create methods with:
+    4. Create methods for payments and other actions stated in the agreement considering:
        - require() checks for amounts/dates
        - access controls
        - corresponding events
@@ -137,7 +137,7 @@ def retriever_node(vector_store: VectorStore):
     return retrieve
 
 
-def generator_node(prompt: PromptTemplate, model: BaseLLM):
+def generator_node(prompt: PromptTemplate, model: BaseLanguageModel):
     def generate(state: State):
         if state["done"]:
             return {}
@@ -155,7 +155,8 @@ def generator_node(prompt: PromptTemplate, model: BaseLLM):
             f"Generating code for chunk {state['current_chunk_index']+1}/{len(state['agreement_chunks'])}")
         response = model.invoke(formatted_prompt)
 
-        match = re.search(r"```solidity\n(.*?)\n```", response, re.DOTALL)
+        content = response.content if hasattr(response, 'content') else response
+        match = re.search(r"```solidity\n(.*?)\n```", content, re.DOTALL)
         if match:
             extracted_code = match.group(1).strip()
             return {"generated_code": extracted_code}
@@ -203,7 +204,7 @@ def logger_node(log_dir: str = "./logs"):
     return log
 
 
-def compile_node(model: BaseLLM):
+def compile_node(model: BaseLanguageModel):
     def compile(state: State):
         if not state["done"]:
             return {}
@@ -258,7 +259,7 @@ def compile_node(model: BaseLLM):
     return compile
 
 
-def test_node(model: BaseLLM):
+def test_node(model: BaseLanguageModel):
     def test(state: State):
         if not state["done"] or not state["generated_code"]:
             return {}
@@ -277,7 +278,8 @@ def test_node(model: BaseLLM):
             print("Invoking test prompt...")
             test_code = model.invoke(test_prompt)
 
-            test_path = test_generator.save_test_file(test_code)
+            content = test_code.content if hasattr(test_code, 'content') else test_code
+            test_path = test_generator.save_test_file(content)
 
             if not test_generator.wait_for_human_review(contract_path, test_path):
                 return {
@@ -299,7 +301,7 @@ def test_node(model: BaseLLM):
     return test
 
 
-def create_chain(vectorstore: VectorStore, model: BaseLLM, text_splitter: TextSplitter, template: str = DEFAULT_PROMPT):
+def create_chain(vectorstore: VectorStore, model: BaseLanguageModel, text_splitter: TextSplitter, template: str = DEFAULT_PROMPT):
     print("Setting up iterative RAG chain...")
 
     prompt = PromptTemplate.from_template(template)
