@@ -1,7 +1,9 @@
 import os
 import re
-from typing import TypedDict
+import time
+from typing import TypedDict, Any
 from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor, TimeoutError
 
 
 from langchain_community.document_loaders import DirectoryLoader, TextLoader
@@ -137,6 +139,26 @@ def retriever_node(vector_store: VectorStore):
     return retrieve
 
 
+def invoke_with_retry(model: BaseLanguageModel, prompt: str, max_retries: int = 3, retry_delay: float = 2.0, timeout: float = 180.0) -> Any:
+    for attempt in range(max_retries):
+        try:
+            with ThreadPoolExecutor(max_workers=1) as executor:
+                future = executor.submit(model.invoke, prompt)
+                return future.result(timeout=timeout)
+        except TimeoutError:
+            print(f"Model invocation timed out after {timeout} seconds (attempt {attempt + 1}/{max_retries})")
+            if attempt == max_retries - 1:
+                raise TimeoutError(f"Model invocation timed out after {timeout} seconds after {max_retries} attempts")
+        except Exception as e:
+            if attempt == max_retries - 1:
+                raise e
+            print(f"Model invocation failed (attempt {attempt + 1}/{max_retries}): {str(e)}")
+        
+        print(f"Retrying in {retry_delay} seconds...")
+        time.sleep(retry_delay)
+        retry_delay *= 2
+
+
 def generator_node(prompt: PromptTemplate, model: BaseLanguageModel):
     def generate(state: State):
         if state["done"]:
@@ -153,7 +175,7 @@ def generator_node(prompt: PromptTemplate, model: BaseLanguageModel):
 
         print(
             f"Generating code for chunk {state['current_chunk_index']+1}/{len(state['agreement_chunks'])}")
-        response = model.invoke(formatted_prompt)
+        response = invoke_with_retry(model, formatted_prompt)
 
         content = response.content if hasattr(response, 'content') else response
         match = re.search(r"```solidity\n(.*?)\n```", content, re.DOTALL)
@@ -161,7 +183,7 @@ def generator_node(prompt: PromptTemplate, model: BaseLanguageModel):
             extracted_code = match.group(1).strip()
             return {"generated_code": extracted_code}
         else:
-            return {"generated_code": response}
+            return {"generated_code": content}
 
     return generate
 
@@ -247,10 +269,9 @@ def compile_node(model: BaseLanguageModel):
                 
                     Output ONLY the fixed Solidity contract without any comments or explanations.
                 """
-                fixed_code = model.invoke(fix_prompt)
-
-                match = re.search(r"```solidity\n(.*?)\n```",
-                                  fixed_code, re.DOTALL)
+                fixed_code = invoke_with_retry(model, fix_prompt)
+                content = fixed_code.content if hasattr(fixed_code, 'content') else fixed_code
+                match = re.search(r"```solidity\n(.*?)\n```", content, re.DOTALL)
                 if match:
                     current_code = match.group(1).strip()
 
@@ -276,7 +297,7 @@ def test_node(model: BaseLanguageModel):
                 state["agreement_to_convert"]
             )
             print("Invoking test prompt...")
-            test_code = model.invoke(test_prompt)
+            test_code = invoke_with_retry(model, test_prompt)
 
             content = test_code.content if hasattr(test_code, 'content') else test_code
             test_path = test_generator.save_test_file(content)
@@ -300,6 +321,64 @@ def test_node(model: BaseLanguageModel):
 
     return test
 
+def validation_node(model: BaseLanguageModel):
+    def validate(state: State):
+        if not state["done"] or not state["generated_code"]:
+            return {}
+            
+        validation_prompt = f"""
+        Analyze the following smart contract for correctness and potential issues:
+        
+        Contract Code:
+        {state["generated_code"]}
+        
+        Original Agreement:
+        {state["agreement_to_convert"]}
+        
+        Perform the following validations:
+        1. Semantic validation - check if all terms are properly translated
+        2. Security pattern validation
+        3. Gas optimization analysis
+        4. State variable validation
+        5. Function validation
+        6. Template compliance check
+        7. Documentation validation
+        8. Cross-reference validation
+        9. Business logic validation
+        10. Integration testing considerations
+        
+        For each validation category, provide:
+        - Pass/Fail status
+        - Detailed explanation of any issues found
+        - Recommendations for improvement
+        
+        Output the validation results in a structured format.
+        """
+        
+        print("Invoking validation prompt...")
+        validation_results = invoke_with_retry(model, validation_prompt)
+        content = validation_results.content if hasattr(validation_results, 'content') else validation_results
+        print(f"Validation results: {content}")
+        
+        fix_prompt = f"""
+        The following validation results found issues in the contract:
+        {content}
+        
+        Please fix the issues in the contract:
+        {state["generated_code"]}
+        """
+        print("Fixing contract...")
+        fixed_code = invoke_with_retry(model, fix_prompt)
+        content = fixed_code.content if hasattr(fixed_code, 'content') else fixed_code
+        print(f"Fixed code: {content}")
+        match = re.search(r"```solidity\n(.*?)\n```", content, re.DOTALL)
+        if match:
+            fixed_code = match.group(1).strip()
+            return {"generated_code": fixed_code}
+        else:
+            return {"generated_code": content}
+        
+    return validate
 
 def create_chain(vectorstore: VectorStore, model: BaseLanguageModel, text_splitter: TextSplitter, template: str = DEFAULT_PROMPT):
     print("Setting up iterative RAG chain...")
@@ -313,6 +392,7 @@ def create_chain(vectorstore: VectorStore, model: BaseLanguageModel, text_splitt
     logger = logger_node()
     compiler = compile_node(model)
     tester = test_node(model)
+    validator = validation_node(model)
 
     graph_builder = StateGraph(State)
 
@@ -323,6 +403,7 @@ def create_chain(vectorstore: VectorStore, model: BaseLanguageModel, text_splitt
     graph_builder.add_node("logger", logger)
     graph_builder.add_node("compiler", compiler)
     graph_builder.add_node("tester", tester)
+    graph_builder.add_node("validator", validator)
 
     # Define the workflow
     graph_builder.add_edge(START, "input_splitter")
@@ -332,11 +413,11 @@ def create_chain(vectorstore: VectorStore, model: BaseLanguageModel, text_splitt
     graph_builder.add_edge("logger", "router")
     graph_builder.add_edge("router", "compiler")
     graph_builder.add_edge("compiler", "tester")
+    graph_builder.add_edge("tester", "validator")
 
-    # Conditional edges
     graph_builder.add_conditional_edges(
-        "tester",
-        lambda state: END if state["done"] else "retriever"
+        "validator",
+        lambda state: END if state["done"] else "generator"
     )
 
     print("RAG chain setup complete.")

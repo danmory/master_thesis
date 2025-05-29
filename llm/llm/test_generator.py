@@ -32,13 +32,21 @@ class TestGenerator:
             module.exports = {{
                 solidity: "{self.config.solidity_version}",
                 paths: {{
-                    sources: "./",
+                    root: ".",
+                    sources: "./contracts",
                     tests: "./test",
                     cache: "./cache",
                     artifacts: "./artifacts"
+                }},
+                mocha: {{
+                    timeout: 40000
                 }}
             }};
         """
+
+        # Create contracts directory
+        contracts_dir = self.config.test_dir / "contracts"
+        contracts_dir.mkdir(exist_ok=True)
 
         (self.config.test_dir / "hardhat.config.js").write_text(config_content)
 
@@ -145,7 +153,7 @@ class TestGenerator:
         """
 
     def save_contract(self, contract_code: str) -> Path:
-        contract_path = self.config.test_dir / \
+        contract_path = self.config.test_dir / "contracts" / \
             f"{self.config.contract_name}.sol"
         contract_path.write_text(contract_code)
         return contract_path

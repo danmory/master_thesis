@@ -4,3 +4,4 @@ __pycache__/
 models/
 venv/
 logs/
+temp_test/
