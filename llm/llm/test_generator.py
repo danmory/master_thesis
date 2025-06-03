@@ -64,7 +64,7 @@ class TestGenerator:
                        cwd=self.config.test_dir, check=True)
         subprocess.run(
             ["npm", "install", "--save-dev", "hardhat",
-                "@nomicfoundation/hardhat-toolbox"],
+                "@nomicfoundation/hardhat-toolbox", "@openzeppelin/contracts"],
             cwd=self.config.test_dir,
             check=True
         )

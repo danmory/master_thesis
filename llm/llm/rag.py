@@ -146,14 +146,17 @@ def invoke_with_retry(model: BaseLanguageModel, prompt: str, max_retries: int = 
                 future = executor.submit(model.invoke, prompt)
                 return future.result(timeout=timeout)
         except TimeoutError:
-            print(f"Model invocation timed out after {timeout} seconds (attempt {attempt + 1}/{max_retries})")
+            print(
+                f"Model invocation timed out after {timeout} seconds (attempt {attempt + 1}/{max_retries})")
             if attempt == max_retries - 1:
-                raise TimeoutError(f"Model invocation timed out after {timeout} seconds after {max_retries} attempts")
+                raise TimeoutError(
+                    f"Model invocation timed out after {timeout} seconds after {max_retries} attempts")
         except Exception as e:
             if attempt == max_retries - 1:
                 raise e
-            print(f"Model invocation failed (attempt {attempt + 1}/{max_retries}): {str(e)}")
-        
+            print(
+                f"Model invocation failed (attempt {attempt + 1}/{max_retries}): {str(e)}")
+
         print(f"Retrying in {retry_delay} seconds...")
         time.sleep(retry_delay)
         retry_delay *= 2
@@ -177,7 +180,8 @@ def generator_node(prompt: PromptTemplate, model: BaseLanguageModel):
             f"Generating code for chunk {state['current_chunk_index']+1}/{len(state['agreement_chunks'])}")
         response = invoke_with_retry(model, formatted_prompt)
 
-        content = response.content if hasattr(response, 'content') else response
+        content = response.content if hasattr(
+            response, 'content') else response
         match = re.search(r"```solidity\n(.*?)\n```", content, re.DOTALL)
         if match:
             extracted_code = match.group(1).strip()
@@ -205,19 +209,25 @@ def logger_node(log_dir: str = "./logs"):
     def log(state: State):
         os.makedirs(log_dir, exist_ok=True)
 
-        log_content = (
-            f"Processing Step {state['current_chunk_index'] + 1}\n"
-            f"{'=' * 50}\n\n"
-            f"Current Agreement Chunk:\n{state['agreement_chunks'][state['current_chunk_index']]}\n\n"
-            f"{'=' * 50}\n\n"
-            f"Relevant Templates and Their Solidity implementation:\n\n"
-            f"{"\n".join(map(lambda d: d.page_content, state['context']))}\n\n"
-            f"{'=' * 50}\n\n"
-            f"Generated Solidity Code:\n{state['generated_code']}\n"
-        )
+        if state["done"]:
+            # Log final state
+            log_path = os.path.join(log_dir, "final.log")
+            log_content = f"Final Generated Code:\n{state['generated_code']}\n"
+        else:
+            # Log intermediate state
+            log_path = os.path.join(
+                log_dir, f"step_{state['current_chunk_index'] + 1}.log")
+            log_content = (
+                f"Processing Step {state['current_chunk_index'] + 1}\n"
+                f"{'=' * 50}\n\n"
+                f"Current Agreement Chunk:\n{state['agreement_chunks'][state['current_chunk_index']]}\n\n"
+                f"{'=' * 50}\n\n"
+                f"Relevant Templates and Their Solidity implementation:\n\n"
+                f"{"\n".join(map(lambda d: d.page_content, state['context']))}\n\n"
+                f"{'=' * 50}\n\n"
+                f"Generated Solidity Code:\n{state['generated_code']}\n"
+            )
 
-        log_path = os.path.join(
-            log_dir, f"step_{state['current_chunk_index'] + 1}.log")
         with open(log_path, "w") as f:
             f.write(log_content)
 
@@ -226,38 +236,47 @@ def logger_node(log_dir: str = "./logs"):
     return log
 
 
-def compile_node(model: BaseLanguageModel):
-    def compile(state: State):
-        if not state["done"]:
+def test_node(model: BaseLanguageModel):
+    def test(state: State):
+        if not state["done"] or not state["generated_code"]:
             return {}
 
-        max_retries = 3
-        retry_count = 0
-        current_code = state["generated_code"]
+        test_dir = Path(os.path.dirname(
+            os.path.abspath(__file__))) / "temp_test"
+        config = TestConfig(test_dir=test_dir)
+        test_generator = TestGenerator(config)
 
-        while retry_count <= max_retries:
+        try:
+            contract_path = test_generator.save_contract(
+                state["generated_code"])
+
+            print("Compiling contract...")
+            contract_name_match = re.search(r"contract\s+(\w+)", state["generated_code"])
+            if not contract_name_match:
+                raise Exception("Could not find contract name in the code")
+            contract_name = contract_name_match.group(1)
+
+            temp_contract_path = os.path.join(test_dir, f"{contract_name}.sol")
+            with open(temp_contract_path, "w") as f:
+                f.write(state["generated_code"])
+
             try:
-                compile_source(current_code)
-                print(
-                    f"Contract compiled successfully at step {state['current_chunk_index'] + 1}.")
-                return {"generated_code": current_code}
-            except FileNotFoundError as e:
-                raise e
+                compile_source(
+                    state["generated_code"],
+                    output_values=["abi", "bin"],
+                    solc_version="0.8.20",
+                    allow_paths=[test_dir]
+                )
+                print("Contract compiled successfully.")
             except Exception as e:
-                retry_count += 1
-                if retry_count > max_retries:
-                    print(
-                        f"Max retries ({max_retries}) reached, returning generated code.")
-                    return {"generated_code": current_code}
-
-                print(
-                    f"Error during compilation (attempt {retry_count}/{max_retries}), fixing the error:\n {str(e)}\n")
+                error_msg = str(e)
+                print(f"Compilation error: {error_msg}")
                 fix_prompt = f"""
                     The generated Solidity contract failed to compile with these errors:
-                    {str(e)}
+                    {error_msg}
 
                     Please fix the following contract:
-                    {current_code}
+                    {state["generated_code"]}
 
                     Instructions:
                     1. Collect all errors and analyze them(they start with Error: <description>).
@@ -270,27 +289,16 @@ def compile_node(model: BaseLanguageModel):
                     Output ONLY the fixed Solidity contract without any comments or explanations.
                 """
                 fixed_code = invoke_with_retry(model, fix_prompt)
-                content = fixed_code.content if hasattr(fixed_code, 'content') else fixed_code
-                match = re.search(r"```solidity\n(.*?)\n```", content, re.DOTALL)
+                content = fixed_code.content if hasattr(
+                    fixed_code, 'content') else fixed_code
+                match = re.search(r"```solidity\n(.*?)\n```",
+                                content, re.DOTALL)
                 if match:
-                    current_code = match.group(1).strip()
-
-                print(f"Contract fixed attempt {retry_count}")
-
-    return compile
-
-
-def test_node(model: BaseLanguageModel):
-    def test(state: State):
-        if not state["done"] or not state["generated_code"]:
-            return {}
-
-        test_dir = Path(os.path.dirname(os.path.abspath(__file__))) / "temp_test"
-        config = TestConfig(test_dir=test_dir)
-        test_generator = TestGenerator(config)
-
-        try:
-            contract_path = test_generator.save_contract(state["generated_code"])
+                    fixed_code = match.group(1).strip()
+                    test_generator.save_contract(fixed_code)
+                    state["generated_code"] = fixed_code
+                else:
+                    state["generated_code"] = content
 
             test_prompt = test_generator.generate_test_prompt(
                 state["generated_code"],
@@ -299,7 +307,8 @@ def test_node(model: BaseLanguageModel):
             print("Invoking test prompt...")
             test_code = invoke_with_retry(model, test_prompt)
 
-            content = test_code.content if hasattr(test_code, 'content') else test_code
+            content = test_code.content if hasattr(
+                test_code, 'content') else test_code
             test_path = test_generator.save_test_file(content)
 
             if not test_generator.wait_for_human_review(contract_path, test_path):
@@ -310,22 +319,25 @@ def test_node(model: BaseLanguageModel):
 
             result = test_generator.run_tests()
 
-            print(f"Test success: {result['success']}, output: {result['output']}")
+            print(
+                f"Test success: {result['success']}, output: {result['output']}")
             return {
                 "test_results": result["output"],
                 "test_success": result["success"]
             }
 
         finally:
-            test_generator.cleanup()
+            # test_generator.cleanup()
+            ...
 
     return test
+
 
 def validation_node(model: BaseLanguageModel):
     def validate(state: State):
         if not state["done"] or not state["generated_code"]:
             return {}
-            
+
         validation_prompt = f"""
         Analyze the following smart contract for correctness and potential issues:
         
@@ -354,22 +366,31 @@ def validation_node(model: BaseLanguageModel):
         
         Output the validation results in a structured format.
         """
-        
+
         print("Invoking validation prompt...")
         validation_results = invoke_with_retry(model, validation_prompt)
-        content = validation_results.content if hasattr(validation_results, 'content') else validation_results
+        content = validation_results.content if hasattr(
+            validation_results, 'content') else validation_results
         print(f"Validation results: {content}")
-        
+
         fix_prompt = f"""
-        The following validation results found issues in the contract:
+        Auditors found issues in the contract:
         {content}
         
         Please fix the issues in the contract:
         {state["generated_code"]}
+
+        Instructions:
+        1. Analyze the issues and fix them.
+        2. Pay attention to duplicated constructors, methods and state variables. Initialize non-existing variables. Add visibility identifiers if needed. Use only Solidity types and syntax.
+        3. Make sure the contract is syntactically correct.
+        4. Repeat steps for all issues.
+        5. Output ONLY the fixed Solidity contract without any comments or explanations.
         """
         print("Fixing contract...")
         fixed_code = invoke_with_retry(model, fix_prompt)
-        content = fixed_code.content if hasattr(fixed_code, 'content') else fixed_code
+        content = fixed_code.content if hasattr(
+            fixed_code, 'content') else fixed_code
         print(f"Fixed code: {content}")
         match = re.search(r"```solidity\n(.*?)\n```", content, re.DOTALL)
         if match:
@@ -377,8 +398,9 @@ def validation_node(model: BaseLanguageModel):
             return {"generated_code": fixed_code}
         else:
             return {"generated_code": content}
-        
+
     return validate
+
 
 def create_chain(vectorstore: VectorStore, model: BaseLanguageModel, text_splitter: TextSplitter, template: str = DEFAULT_PROMPT):
     print("Setting up iterative RAG chain...")
@@ -390,7 +412,6 @@ def create_chain(vectorstore: VectorStore, model: BaseLanguageModel, text_splitt
     generator = generator_node(prompt, model)
     router = router_node()
     logger = logger_node()
-    compiler = compile_node(model)
     tester = test_node(model)
     validator = validation_node(model)
 
@@ -401,7 +422,6 @@ def create_chain(vectorstore: VectorStore, model: BaseLanguageModel, text_splitt
     graph_builder.add_node("generator", generator)
     graph_builder.add_node("router", router)
     graph_builder.add_node("logger", logger)
-    graph_builder.add_node("compiler", compiler)
     graph_builder.add_node("tester", tester)
     graph_builder.add_node("validator", validator)
 
@@ -409,14 +429,13 @@ def create_chain(vectorstore: VectorStore, model: BaseLanguageModel, text_splitt
     graph_builder.add_edge(START, "input_splitter")
     graph_builder.add_edge("input_splitter", "retriever")
     graph_builder.add_edge("retriever", "generator")
-    graph_builder.add_edge("generator", "logger")
-    graph_builder.add_edge("logger", "router")
-    graph_builder.add_edge("router", "compiler")
-    graph_builder.add_edge("compiler", "tester")
-    graph_builder.add_edge("tester", "validator")
+    graph_builder.add_edge("generator", "router")
+    graph_builder.add_edge("router", "validator")
+    graph_builder.add_edge("validator", "logger")
+    graph_builder.add_edge("logger", "tester")
 
     graph_builder.add_conditional_edges(
-        "validator",
+        "tester",
         lambda state: END if state["done"] else "generator"
     )
 
