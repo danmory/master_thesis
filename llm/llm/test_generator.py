@@ -38,6 +38,16 @@ class TestGenerator:
                     cache: "./cache",
                     artifacts: "./artifacts"
                 }},
+                networks: {{
+                    hardhat: {{
+                        // Set initial timestamp to a fixed value
+                        chainId: 31337,
+                        mining: {{
+                            auto: true,
+                            interval: 0
+                        }}
+                    }}
+                }},
                 mocha: {{
                     timeout: 40000
                 }}
@@ -75,6 +85,7 @@ class TestGenerator:
            - Use Hardhat and Chai for testing
            - Deploy the contract in beforeEach using ethers.js
            - Get signers (owner, tenant, etc.) using ethers.getSigners()
+           - Reset the network timestamp before each test
            - Example setup:
              ```javascript
              let contract;
@@ -82,10 +93,14 @@ class TestGenerator:
              let tenant;
              
              beforeEach(async function () {{
+                 // Reset network to a known state
+                 await network.provider.send("evm_setNextBlockTimestamp", [Math.floor(Date.now() / 1000)]);
+                 await network.provider.send("evm_mine");
+                 
                  [owner, tenant] = await ethers.getSigners();
                  const Contract = await ethers.getContractFactory("Agreement");
                  contract = await Contract.deploy();
-                 await contract.deployed();
+                 await contract.waitForDeployment();
              }});
              ```
 
@@ -95,7 +110,7 @@ class TestGenerator:
               - Example:
                 ```javascript
                 it("Should initialize state variables correctly", async function () {{
-                    expect(await contract.rentAmount()).to.equal(ethers.utils.parseEther("1000"));
+                    expect(await contract.rentAmount()).to.equal(ethers.parseEther("1000"));
                     expect(await contract.startDate()).to.equal(startTimestamp);
                 }});
                 ```
@@ -118,9 +133,9 @@ class TestGenerator:
               - Example:
                 ```javascript
                 it("Should accept correct rent payment", async function () {{
-                    await expect(contract.connect(tenant).payRent({{ value: ethers.utils.parseEther("1000") }}))
+                    await expect(contract.connect(tenant).payRent({{ value: ethers.parseEther("1000") }}))
                         .to.emit(contract, "RentPaid")
-                        .withArgs(tenant.address, ethers.utils.parseEther("1000"));
+                        .withArgs(tenant.address, ethers.parseEther("1000"));
                 }});
                 ```
 
@@ -131,7 +146,7 @@ class TestGenerator:
               - Example:
                 ```javascript
                 it("Should revert when paying incorrect amount", async function () {{
-                    await expect(contract.connect(tenant).payRent({{ value: ethers.utils.parseEther("500") }}))
+                    await expect(contract.connect(tenant).payRent({{ value: ethers.parseEther("500") }}))
                         .to.be.revertedWith("Incorrect payment amount");
                 }});
                 ```
