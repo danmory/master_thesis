@@ -53,6 +53,7 @@ if chain_type == constants.ChainType.RAG:
     embeddings = SentenceTransformerEmbeddings(
     model_name=constants.EMBEDDINGS_MODEL_NAME, model_kwargs={'device': 'cuda'})
     vector_store = rag.create_vector_store(embeddings, templates)
+    chain = rag.RAGChain().create_chain(model, vector_store, text_splitter)
 elif chain_type == constants.ChainType.ITERATIONAL:
     chain = iterational_llm.IterationalLLMChain().create_chain(model, text_splitter)
 elif chain_type == constants.ChainType.ONLY:
