@@ -7,7 +7,7 @@ import time
 
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts import PromptTemplate
-from solcx import compile_source
+from solcx import compile_source, install_solc
 
 from .test_generator import TestGenerator, TestConfig
 
@@ -101,6 +101,7 @@ def test_node(model: BaseLanguageModel):
                 f.write(state["generated_code"])
 
             try:
+                install_solc("0.8.20")
                 compile_source(
                     state["generated_code"],
                     output_values=["abi", "bin"],

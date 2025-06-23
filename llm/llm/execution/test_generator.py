@@ -91,9 +91,11 @@ class TestGenerator:
              let contract;
              let owner;
              let tenant;
+             let snapshot;
              
              beforeEach(async function () {{
                  // Reset network to a known state
+                 snapshot = await network.provider.send("evm_snapshot");
                  await network.provider.send("evm_setNextBlockTimestamp", [Math.floor(Date.now() / 1000)]);
                  await network.provider.send("evm_mine");
                  
@@ -101,6 +103,10 @@ class TestGenerator:
                  const Contract = await ethers.getContractFactory("Agreement");
                  contract = await Contract.deploy();
                  await contract.waitForDeployment();
+             }});
+
+             afterEach(async function () {{
+                 await network.provider.send("evm_revert", [snapshot]);
              }});
              ```
 
